@@ -1,4 +1,3 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 
@@ -21,8 +20,11 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
   integrations: [mdx()],
+  // Content images (src/assets/) get width/height, srcset and sizes.
+  image: { layout: 'constrained', responsiveStyles: true },
   devToolbar: { enabled: false },
-  build: { format: 'directory' },
+  // Inline all CSS: removes a render-blocking request on first view.
+  build: { format: 'directory', inlineStylesheets: 'always' },
   vite: {
     build: {
       rolldownOptions: {

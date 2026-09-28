@@ -40,9 +40,9 @@ h2 {
   text-wrap: balance;
 }
 h3 { font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em; line-height: 1.4; }
-h4 { font-family: var(--font-serif); font-weight: 600; font-size: 1.28rem; letter-spacing: -0.005em; line-height: 1.25; }
+h4, .h4 { font-family: var(--font-serif); font-weight: 600; font-size: 1.28rem; letter-spacing: -0.005em; line-height: 1.25; }
 strong, b { font-weight: 600; }
-p { text-wrap: pretty; }
+/* No global `text-wrap: pretty`: it made every relayout of long articles expensive. */
 
 ::selection { background: var(--accent); color: var(--on-accent); }
 
@@ -209,6 +209,12 @@ a.plain, a.plain:hover { background-image: none; }
 .prose > h3 { margin-top: 1.9em; }
 .prose > h3 + * { margin-top: 0.45em; }
 .prose > h4 { margin-top: 1.6em; }
+/* Heavy report figures skip layout and paint until they approach the viewport,
+   so first render and each web-font swap only lay out what is on screen. */
+.prose > :is(figure, section) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
 /* Embedded report components get more air than paragraphs. */
 .prose > :is(figure, aside, section, ol.keypoints) { margin-top: 1.75em; }
 .prose > :is(figure, aside, section, ol.keypoints) + :not(h2) { margin-top: 1.75em; }
@@ -320,17 +326,27 @@ a.plain, a.plain:hover { background-image: none; }
 /* ---------- Print (A4) ---------- */
 @page { size: A4; margin: 16mm 14mm 18mm; }
 @media print {
-  :root {
+  /* :not(#print) outranks both dark-theme selectors, so print is always light. */
+  :root:not(#print) {
     --paper: #fff; --surface: #fff; --surface-2: #f2f2f2;
     --ink: #000; --ink-2: #333; --ink-3: #555; --ink-3-text: #555;
     --line: #ccc; --line-strong: #999;
-    --accent: #1B4D3E; --accent-soft: #eef3f0;
+    --accent: #1B4D3E; --accent-soft: #eef3f0; --on-accent: #fff;
+    --up: #1A7A54; --down: #BE3A2B; --warn: #9C6C15;
+    --up-soft: #E0F0E8; --down-soft: #F8E4E1; --warn-soft: #F6EDDB;
+    --up-text: #197651; --down-text: #BA392A; --warn-text: #895F12;
     color-scheme: light;
   }
   html, body { background: #fff; font-size: 10.5pt; }
-  .no-print, .masthead, .skip, .toc, .progress, .pager, .theme-toggle, .search-link { display: none !important; }
+  .no-print, .masthead, .footer, .skip, .toc, .progress, .pager, .theme-toggle, .search-link { display: none !important; }
   .wrap { max-width: none; padding: 0; }
   .rv { opacity: 1 !important; transform: none !important; }
+  .bars-armed .fill { transform: none !important; }
+  /* Data encoded as fills must print even with background graphics off. */
+  .fill, .track, .pill, .ticker, .tile, .matrix td, .matrix .sw, .ladder .here *, .callout, .prose > blockquote, tr.total > * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   a { background: none !important; color: inherit; }
   .prose a[href^='http']::after, .sources a[href^='http']::after {
     content: ' (' attr(href) ')';
@@ -342,4 +358,5 @@ a.plain, a.plain:hover { background-image: none; }
   table, figure, .keep, .ticker, .bars, .ladder, .matrix, .scenarios, .calendar, .callout, blockquote { break-inside: avoid; page-break-inside: avoid; }
   .prose > h2 { padding-top: 18pt; }
   .prose > table { display: table; width: 100%; overflow: visible; }
+  .prose > :is(figure, section) { content-visibility: visible; }
 }

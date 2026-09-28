@@ -97,7 +97,32 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={FONTS} />
+    <!-- Non-blocking: text paints at once in metric-matched fallbacks, then swaps. -->
+    <!--
+      Web fonts without render-blocking: the preload starts the fetch early and a
+      script-inserted stylesheet (never render-blocking) applies it. The same link
+      is added to each incoming page so ClientRouter keeps the live one on swap.
+    -->
+    <link rel="preload" as="style" href={FONTS} id="webfonts" />
+    <script is:inline>
+      (function () {
+        var href = document.getElementById('webfonts').href;
+        function add(doc) {
+          if (doc.head.querySelector('link[data-webfonts]')) return;
+          var l = doc.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = href;
+          l.setAttribute('data-webfonts', '');
+          doc.head.appendChild(l);
+        }
+        add(document);
+        if (!window.__tqFonts) {
+          window.__tqFonts = 1;
+          document.addEventListener('astro:before-swap', function (e) { add(e.newDocument); });
+        }
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href={FONTS} /></noscript>
 
     <ClientRouter />
     {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
