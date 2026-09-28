@@ -1,6 +1,6 @@
 # Chuyển sang tên miền riêng
 
-Hiện trang chạy tại `https://<tên-người-dùng>.github.io/dautucungthienquoc/`. Chuyển sang tên miền riêng (ví dụ `dautucungthienquoc.vn`) gồm **hai dòng cấu hình**, **một file `CNAME`** và vài bước cài đặt trên GitHub và nhà cung cấp tên miền.
+Hiện trang chạy tại `https://voq30113-bit.github.io/dautucungthienquoc/`. Chuyển sang tên miền riêng (ví dụ `dautucungthienquoc.vn`) gồm **hai dòng cấu hình**, **một file `CNAME`** và vài bước cài đặt trên GitHub và nhà cung cấp tên miền.
 
 ## 1. Sửa hai dòng trong `astro.config.mjs`
 
@@ -44,7 +44,7 @@ Có thể thêm bốn bản ghi `AAAA` (IPv6):
 2606:50c0:8003::153
 ```
 
-**Tên miền con `www`**: tạo bản ghi `CNAME` trỏ `www` tới `<tên-người-dùng>.github.io`.
+**Tên miền con `www`**: tạo bản ghi `CNAME` trỏ `www` tới `voq30113-bit.github.io`.
 
 Thay đổi DNS có thể mất vài phút đến 24 giờ để có hiệu lực.
 
@@ -67,4 +67,4 @@ Sau khi workflow **Deploy** chạy xong, kiểm tra:
 - Trang chủ mở được tại tên miền mới, có ổ khoá HTTPS.
 - Bấm vài liên kết: không có liên kết nào còn chứa `/dautucungthienquoc/`.
 - `https://<tên-miền>/sitemap.xml` và `https://<tên-miền>/rss.xml` hiện địa chỉ mới.
-- Địa chỉ cũ `…github.io/dautucungthienquoc/` được GitHub tự chuyển hướng sang tên miền mới.
+- Địa chỉ cũ `https://voq30113-bit.github.io/dautucungthienquoc/` được GitHub tự chuyển hướng sang tên miền mới.

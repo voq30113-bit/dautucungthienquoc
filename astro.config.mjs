@@ -8,10 +8,9 @@ import mdx from '@astrojs/mdx';
  * actions/configure-pages, so the published site is always correct.
  * These fallbacks are used for local builds.
  *
- * TODO(owner): replace `TODO-github-username` with your GitHub username.
  * Moving to a custom domain: change these two lines — see docs/DOMAIN.md.
  */
-const SITE = process.env.SITE_URL || 'https://TODO-github-username.github.io';
+const SITE = process.env.SITE_URL || 'https://voq30113-bit.github.io';
 const BASE = process.env.SITE_BASE ?? '/dautucungthienquoc';
 
 export default defineConfig({

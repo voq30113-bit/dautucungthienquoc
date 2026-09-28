@@ -30,7 +30,6 @@ Không có đăng nhập, cơ sở dữ liệu hay backend. Trang vẫn là web 
 
 ## 2. Các việc còn để ngỏ
 
-- **Tên người dùng GitHub:** `astro.config.mjs` đang dùng giá trị tạm `TODO-github-username`. Bản chạy trên GitHub Actions tự lấy đúng địa chỉ, nhưng nên sửa dòng này để bản build trên máy khớp với bản thật.
 - **Logo:** hiện dùng wordmark bằng chữ. Khi có logo SVG, chỉ cần sửa `src/components/Brand.astro` (xem hướng dẫn trong README).
 - **Tên miền riêng:** xem `docs/DOMAIN.md`.
 - **Phần giới thiệu tác giả:** trang `/gioi-thieu/` mới mô tả trang và nguyên tắc biên tập. Nếu muốn, chủ trang có thể bổ sung phần giới thiệu bản thân.

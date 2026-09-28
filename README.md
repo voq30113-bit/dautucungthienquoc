@@ -2,6 +2,8 @@
 
 Website nghiên cứu thị trường chứng khoán Việt Nam: nhận định trước phiên, tổng kết phiên, báo cáo vĩ mô hằng tuần và các bài phân tích chuyên sâu. Độc lập, dựa trên dữ liệu công khai.
 
+Địa chỉ: **https://voq30113-bit.github.io/dautucungthienquoc/**
+
 Trang là web tĩnh, build bằng [Astro](https://astro.build), tìm kiếm bằng [Pagefind](https://pagefind.app) và tự động đăng lên GitHub Pages mỗi khi có commit vào nhánh `main`.
 
 ## Chạy trên máy
