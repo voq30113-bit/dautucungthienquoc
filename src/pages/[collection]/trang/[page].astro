@@ -3,7 +3,7 @@ import CollectionIndex from '../../../components/CollectionIndex.astro';
 import { COLLECTIONS, PAGE_SIZE, type Entry, type Key, getEntries } from '../../../lib/content';
 
 export async function getStaticPaths() {
-  const paths = [];
+  const paths: { params: { collection: string; page: string }; props: Props }[] = [];
   for (const collection of COLLECTIONS) {
     const all = await getEntries(collection);
     const totalPages = Math.ceil(all.length / PAGE_SIZE);

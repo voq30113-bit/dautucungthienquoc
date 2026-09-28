@@ -5,7 +5,7 @@ import * as components from '../../components/mdx';
 import { COLLECTIONS, type Entry, getEntries } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const paths = [];
+  const paths: { params: { collection: string; slug: string }; props: Props }[] = [];
   for (const collection of COLLECTIONS) {
     const entries = await getEntries(collection);
     entries.forEach((entry, i) => {
