@@ -32,6 +32,9 @@ export const entryHref = (e: Entry) => href(entryPath(e));
 /** Unique view-transition name so list headlines morph into the article h1. */
 export const vtName = (e: Entry) => `h-${e.collection}-${e.id}`.replace(/[^a-zA-Z0-9_-]/g, '-');
 
+/** Entries from separate queries are distinct objects; compare by identity keys. */
+export const sameEntry = (a?: Entry, b?: Entry) => !!a && !!b && a.collection === b.collection && a.id === b.id;
+
 export function isCollection(key: string): key is Key {
   return (COLLECTIONS as readonly string[]).includes(key);
 }
@@ -56,11 +59,13 @@ export async function getAllEntries(): Promise<Entry[]> {
 
 /** Reading time for Vietnamese prose (~220 syllable-words per minute). */
 export function readingTime(e: Entry): number {
+  // MDX prose often lives inside component props, so keep quoted strings and
+  // count only tokens that contain a letter (drops markup and bare figures).
   const text = (e.body ?? '')
-    .replace(/^import .*$/gm, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/[#>*_`|[\]()-]/g, ' ');
-  const words = text.split(/\s+/).filter(Boolean).length;
+    .replace(/^(import|export) .*$/gm, '')
+    .replace(/\b[a-zA-Z]+(?==)|\b[a-zA-Z]+:(?=\s)/g, ' ')
+    .replace(/[<>{}[\]()#*_`|='",:/-]/g, ' ');
+  const words = text.split(/\s+/).filter((w) => /\p{L}/u.test(w)).length;
   return Math.max(1, Math.round(words / 220));
 }
 

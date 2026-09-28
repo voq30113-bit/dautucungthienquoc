@@ -147,7 +147,7 @@ a.plain, a.plain:hover { background-image: none; }
   color: var(--accent);
   letter-spacing: 0.04em;
   flex: none;
-  min-width: 2.2em;
+  min-width: 2.7em;
 }
 .sec-head h2 { flex: 1; }
 .sec-head .aside {
@@ -184,8 +184,8 @@ a.plain, a.plain:hover { background-image: none; }
   font-size: 1.0625rem;
 }
 .prose > * + * { margin-top: 1.05em; }
-.prose p, .prose ul, .prose ol, .prose blockquote, .prose > h3 { max-width: 68ch; }
-.prose h2 {
+.prose > :is(p, ul, ol, blockquote, h3) { max-width: 68ch; }
+.prose > h2 {
   counter-increment: sec;
   display: flex;
   align-items: baseline;
@@ -197,36 +197,40 @@ a.plain, a.plain:hover { background-image: none; }
   margin-top: 0;
   scroll-margin-top: calc(var(--mast-condensed) - 30px);
 }
-.prose h2::before {
+.prose > h2::before {
   content: counter(sec, upper-roman);
   font: 600 12px/1 var(--font-mono);
   color: var(--accent);
   letter-spacing: 0.04em;
   flex: none;
-  min-width: 2.2em;
+  min-width: 2.7em;
 }
-.prose h2 + * { margin-top: 0; }
-.prose h3 { margin-top: 1.9em; }
-.prose h3 + * { margin-top: 0.45em; }
-.prose h4 { margin-top: 1.6em; }
-.prose a {
+.prose > h2 + * { margin-top: 0; }
+.prose > h3 { margin-top: 1.9em; }
+.prose > h3 + * { margin-top: 0.45em; }
+.prose > h4 { margin-top: 1.6em; }
+/* Embedded report components get more air than paragraphs. */
+.prose > :is(figure, aside, section, ol.keypoints) { margin-top: 1.75em; }
+.prose > :is(figure, aside, section, ol.keypoints) + :not(h2) { margin-top: 1.75em; }
+.prose > h2 + :is(figure, aside, section, ol.keypoints) { margin-top: 0; }
+.prose :is(p, li, td, blockquote) > a {
   color: var(--accent);
   background-image: linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--line-strong), var(--line-strong));
   background-size: 0% 1px, 100% 1px;
   background-position: 0 100%, 0 100%;
 }
-.prose a:hover { background-size: 100% 1px, 100% 1px; }
-.prose ul, .prose ol { padding-left: 1.35em; }
-.prose li + li { margin-top: 0.35em; }
-.prose ul > li { list-style: none; position: relative; }
-.prose ul > li::before {
+.prose :is(p, li, td, blockquote) > a:hover { background-size: 100% 1px, 100% 1px; }
+.prose > :is(ul, ol):not([class]) { padding-left: 1.35em; }
+.prose > :is(ul, ol):not([class]) > li + li { margin-top: 0.35em; }
+.prose > ul:not([class]) > li { list-style: none; position: relative; }
+.prose > ul:not([class]) > li::before {
   content: '–';
   position: absolute;
   left: -1.2em;
   color: var(--ink-3);
 }
-.prose ol > li::marker { font: 500 0.8em var(--font-mono); color: var(--accent); }
-.prose hr { border: 0; border-top: 1px solid var(--line); margin-block: 2em; }
+.prose > ol > li::marker { font: 500 0.8em var(--font-mono); color: var(--accent); }
+.prose > hr { border: 0; border-top: 1px solid var(--line); margin-block: 2em; }
 .prose code {
   font-family: var(--font-mono);
   font-size: 0.88em;
@@ -235,16 +239,16 @@ a.plain, a.plain:hover { background-image: none; }
   border-radius: 3px;
 }
 /* Markdown blockquotes read as accent callouts, so plain-Markdown bulletins get one. */
-.prose blockquote {
+.prose > blockquote {
   background: var(--accent-soft);
   border-left: 3px solid var(--accent);
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 16px 18px;
 }
-.prose blockquote > * + * { margin-top: 0.6em; }
+.prose > blockquote > * + * { margin-top: 0.6em; }
 
 /* Markdown tables: scroll inside their own box, never the page. */
-.prose table {
+.prose > table {
   display: block;
   width: fit-content;
   max-width: 100%;
@@ -254,7 +258,7 @@ a.plain, a.plain:hover { background-image: none; }
   font-size: 14px;
   line-height: 1.45;
 }
-.prose th {
+.prose > table th {
   font: 500 10.5px/1.4 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -264,11 +268,10 @@ a.plain, a.plain:hover { background-image: none; }
   border-bottom: 1px solid var(--line-strong);
   white-space: nowrap;
 }
-.prose td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
-.prose tr:first-child td { border-top: 0; }
-.prose td[align='right'], .prose th[align='right'],
-.prose td[style*='right'], .prose th[style*='right'] { text-align: right; }
-.prose td[align='right'], .prose td[style*='right'] {
+.prose > table td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+.prose > table tr:first-child td { border-top: 0; }
+.prose > table :is(td, th):is([align='right'], [style*='right']) { text-align: right; }
+.prose > table td:is([align='right'], [style*='right']) {
   font-family: var(--font-mono);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -337,6 +340,6 @@ a.plain, a.plain:hover { background-image: none; }
   }
   h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
   table, figure, .keep, .ticker, .bars, .ladder, .matrix, .scenarios, .calendar, .callout, blockquote { break-inside: avoid; page-break-inside: avoid; }
-  .prose h2 { padding-top: 18pt; }
-  .prose table { display: table; width: 100%; overflow: visible; }
+  .prose > h2 { padding-top: 18pt; }
+  .prose > table { display: table; width: 100%; overflow: visible; }
 }
