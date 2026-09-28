@@ -19,7 +19,7 @@ const pill = { pos: 'pos', neu: '', neg: 'neg' }[verdict];
 
 <section class="sector keep">
   <div class="head">
-    <h4>{name}</h4>
+    <h3 class="h4">{name}</h3>
     <span class:list={['pill', pill]}>{vi.components.verdict[verdict]}</span>
     {weight && <span class="weight">{weight}</span>}
   </div>
@@ -42,7 +42,7 @@ const pill = { pos: 'pos', neu: '', neg: 'neg' }[verdict];
   .sector { border-top: 1px solid var(--line-strong); padding: 16px 0 6px; }
   .sector + :global(.sector) { margin-top: 10px; }
   .head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-  h4 { margin: 0 !important; }
+  h3 { margin: 0; }
   .weight {
     margin-left: auto;
     font: 400 11.5px/1.4 var(--font-mono);

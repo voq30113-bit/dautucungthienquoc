@@ -27,7 +27,7 @@ const { scenarios, caption } = Astro.props;
       scenarios.map((s) => (
         <article class:list={['card', s.tone]}>
           <header>
-            <h4>{s.name}</h4>
+            <h3 class="h4">{s.name}</h3>
             <span class:list={['pill', { pos: s.tone === 'pos', neg: s.tone === 'neg' }]}>
               <span class="sr-only">{vi.components.probability} </span>
               {s.probability}%
@@ -60,7 +60,7 @@ const { scenarios, caption } = Astro.props;
   .card.neg { border-top-color: var(--down); }
   .card.neu { border-top-color: var(--accent); }
   header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  h4 { margin: 0 !important; font-size: 1.15rem; }
+  h3 { margin: 0; font-size: 1.15rem; }
   .range {
     margin-top: 10px;
     font: 500 15px/1.3 var(--font-mono);

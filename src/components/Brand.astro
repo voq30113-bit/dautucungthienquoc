@@ -7,9 +7,10 @@
  * To use an SVG logo, change only this file:
  *   1. Save the logo as src/assets/logo.svg
  *   2. Replace the <slot name="mark"> fallback below with:
- *        <Logo class="brand-logo" aria-hidden="true" />
+ *        <Logo class="brand-logo" aria-hidden="true" /><span class="sr-only">{vi.site.name}</span>
  *      after adding `import Logo from '../assets/logo.svg';` to the frontmatter.
- *   3. Keep the `.sr-only` name span so the link keeps its accessible name.
+ *   3. Give the logo an accessible name, e.g. <span class="sr-only">{vi.site.name}</span>
+ *      next to it (the visible wordmark text is the name today).
  * A one-off override is also possible from any template:
  *   <Brand><svg slot="mark">…</svg></Brand>
  */
@@ -26,16 +27,12 @@ const { href = link(''), size = 'md', class: cls } = Astro.props;
 const Tag = href ? 'a' : 'span';
 ---
 
-<Tag
-  class:list={['brand', 'plain', `brand-${size}`, cls]}
-  href={href ?? undefined}
-  aria-label={href ? `${vi.site.name} — ${vi.site.homeLabel}` : undefined}
->
+<Tag class:list={['brand', 'plain', `brand-${size}`, cls]} href={href ?? undefined}>
   <slot name="mark">
-    <span class="brand-kicker" aria-hidden={href ? 'true' : undefined}>{vi.site.brandKicker}</span>
-    <span class="brand-name" aria-hidden={href ? 'true' : undefined}>{vi.site.brandName}</span>
+    <span class="brand-kicker">{vi.site.brandKicker}</span>
+    <span class="brand-name">{vi.site.brandName}</span>
   </slot>
-  {!href && <span class="sr-only">{vi.site.name}</span>}
+  {href && <span class="sr-only"> — {vi.site.homeLabel}</span>}
 </Tag>
 
 <style>
