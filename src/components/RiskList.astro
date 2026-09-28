@@ -1,0 +1,40 @@
+---
+/*
+ * <RiskList items={[{ name: 'Tỷ giá', severity: 'hi', text: '…' }]} />
+ */
+import { vi } from '../i18n/vi';
+
+interface Props {
+  items: { name: string; severity: 'hi' | 'md' | 'lo'; text: string }[];
+  caption?: string;
+}
+const { items, caption } = Astro.props;
+const chip = { hi: 'neg', md: 'warn', lo: '' } as const;
+---
+
+<figure class="risks keep">
+  {caption && <figcaption class="caption">{caption}</figcaption>}
+  <ul data-reveal-stagger>
+    {
+      items.map((r) => (
+        <li>
+          <div class="head">
+            <span class="name">{r.name}</span>
+            <span class:list={['pill', chip[r.severity]]}>{vi.components.severity[r.severity]}</span>
+          </div>
+          <p>{r.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</figure>
+
+<style>
+  .risks { margin-inline: 0; margin-bottom: 0; }
+  .caption { margin-bottom: 10px; }
+  ul { list-style: none; border-top: 1px solid var(--line-strong); }
+  li { padding: 12px 0 13px; border-bottom: 1px solid var(--line); }
+  .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .name { font-weight: 600; }
+  p { margin-top: 4px; color: var(--ink-2); font-size: 15px; line-height: 1.6; max-width: 68ch; }
+</style>

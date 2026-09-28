@@ -1,0 +1,46 @@
+---
+/*
+ * <KeyPoints items={['Điểm thứ nhất', 'Điểm thứ hai']} />
+ */
+import { pad2 } from '../lib/format';
+import { vi } from '../i18n/vi';
+
+interface Props {
+  items: string[];
+  label?: string;
+}
+const { items, label = vi.components.keyPoints } = Astro.props;
+---
+
+<ol class="keypoints" aria-label={label} data-reveal-stagger>
+  {
+    items.map((text, i) => (
+      <li>
+        <span class="idx" aria-hidden="true">{pad2(i + 1)}</span>
+        <span class="txt">{text}</span>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .keypoints {
+    list-style: none;
+    border-top: 1px solid var(--line-strong);
+    max-width: 68ch;
+  }
+  li {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 0 6px;
+    padding: 12px 0 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .idx {
+    font: 500 12px/1.6 var(--font-mono);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.2em;
+  }
+  .txt { line-height: 1.6; }
+</style>

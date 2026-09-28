@@ -1,0 +1,140 @@
+---
+/*
+ * <DataTable
+ *   caption="Giao dịch khối ngoại theo sàn (tỷ đồng)"
+ *   columns={[{ label: 'Sàn' }, { label: 'Mua', num: true }, { label: 'Bán', num: true }]}
+ *   rows={[['HOSE', '1.842', '2.354']]}
+ *   total={['Tổng', '2.101', '2.613']}
+ * />
+ * Cells may be strings or numbers; numbers are formatted Vietnamese-style.
+ * Prefix a cell with '+' or '−' and set `signed: true` on its column to colour it.
+ */
+import { formatNumber } from '../lib/format';
+
+interface Column {
+  label: string;
+  num?: boolean;
+  decimals?: number;
+  signed?: boolean;
+}
+type Cell = string | number;
+interface Props {
+  caption: string;
+  columns: Column[];
+  rows: Cell[][];
+  total?: Cell[];
+  note?: string;
+}
+const { caption, columns, rows, total, note } = Astro.props;
+
+const text = (cell: Cell, col: Column) =>
+  typeof cell === 'number' ? formatNumber(cell, col.decimals ?? 0, col.signed) : cell;
+const tone = (cell: Cell, col: Column) => {
+  if (!col.signed) return undefined;
+  const s = String(typeof cell === 'number' ? text(cell, col) : cell).trim();
+  if (s.startsWith('+')) return 'up';
+  if (s.startsWith('−') || s.startsWith('-')) return 'down';
+  return undefined;
+};
+---
+
+<figure class="dt keep">
+  <div class="dt-scroll" tabindex="0" role="region" aria-label={caption}>
+    <table>
+      <caption class="caption">{caption}</caption>
+      <thead>
+        <tr>
+          {
+            columns.map((col) => (
+              <th scope="col" class:list={{ num: col.num }}>
+                {col.label}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              {row.map((cell, i) =>
+                i === 0 ? (
+                  <th scope="row">{text(cell, columns[i])}</th>
+                ) : (
+                  <td class:list={[{ num: columns[i]?.num }, tone(cell, columns[i])]}>{text(cell, columns[i])}</td>
+                ),
+              )}
+            </tr>
+          ))
+        }
+        {
+          total && (
+            <tr class="total">
+              {total.map((cell, i) =>
+                i === 0 ? (
+                  <th scope="row">{text(cell, columns[i])}</th>
+                ) : (
+                  <td class:list={[{ num: columns[i]?.num }, tone(cell, columns[i])]}>{text(cell, columns[i])}</td>
+                ),
+              )}
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </div>
+  {note && <figcaption class="dt-note">{note}</figcaption>}
+</figure>
+
+<style>
+  .dt { margin-inline: 0; margin-bottom: 0; }
+  .dt-scroll {
+    position: relative;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  table { width: 100%; background: var(--surface); font-size: 14px; line-height: 1.45; }
+  caption {
+    caption-side: top;
+    text-align: left;
+    padding: 12px 14px 10px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  thead th {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3-text);
+    text-align: left;
+    padding: 10px 14px 9px;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+  tbody th, td {
+    padding: 9px 14px;
+    border-top: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  tbody tr:first-child > * { border-top: 0; }
+  tbody th { font-weight: 500; white-space: nowrap; }
+  .num {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  thead th.num { font-size: 10.5px; }
+  td.up { color: var(--up-text); }
+  td.down { color: var(--down-text); }
+  tr.total > * { background: var(--surface-2); font-weight: 600; border-top: 1px solid var(--line-strong); }
+  .dt-note {
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    max-width: 68ch;
+  }
+</style>

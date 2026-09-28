@@ -1,0 +1,52 @@
+---
+/*
+ * <EventCalendar items={[{ date: '29/09', title: 'Công bố CPI tháng 9', sub: 'Tổng cục Thống kê' }]} />
+ */
+interface Props {
+  items: { date: string; title: string; sub?: string }[];
+  caption?: string;
+}
+const { items, caption } = Astro.props;
+---
+
+<figure class="calendar keep">
+  {caption && <figcaption class="caption">{caption}</figcaption>}
+  <ul>
+    {
+      items.map((e) => (
+        <li>
+          <span class="date">{e.date}</span>
+          <span class="ev">
+            <span class="title">{e.title}</span>
+            {e.sub && <span class="sub">{e.sub}</span>}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</figure>
+
+<style>
+  .calendar { margin-inline: 0; margin-bottom: 0; }
+  .caption { margin-bottom: 10px; }
+  ul { list-style: none; border-top: 1px solid var(--line-strong); }
+  li {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 2px 14px;
+    padding: 10px 0 11px;
+    border-bottom: 1px solid var(--line);
+  }
+  .date {
+    font: 500 12.5px/1.5 var(--font-mono);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.1em;
+  }
+  .ev { display: flex; flex-direction: column; }
+  .title { font-weight: 500; line-height: 1.5; }
+  .sub { font-size: 13.5px; color: var(--ink-2); }
+  @media (max-width: 640px) {
+    li { grid-template-columns: 1fr; }
+  }
+</style>

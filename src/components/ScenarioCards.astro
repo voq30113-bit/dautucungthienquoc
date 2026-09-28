@@ -1,0 +1,71 @@
+---
+/*
+ * <ScenarioCards scenarios={[
+ *   { name: 'Cơ sở', probability: 55, range: '1.740 – 1.810', body: '…', tone: 'neu' },
+ * ]} />
+ */
+import { vi } from '../i18n/vi';
+
+interface Scenario {
+  name: string;
+  probability: number;
+  range: string;
+  body: string;
+  tone?: 'pos' | 'neu' | 'neg';
+}
+interface Props {
+  scenarios: Scenario[];
+  caption?: string;
+}
+const { scenarios, caption } = Astro.props;
+---
+
+<figure class="scenarios keep">
+  {caption && <figcaption class="caption">{caption}</figcaption>}
+  <div class="grid" data-reveal-stagger>
+    {
+      scenarios.map((s) => (
+        <article class:list={['card', s.tone]}>
+          <header>
+            <h4>{s.name}</h4>
+            <span class:list={['pill', { pos: s.tone === 'pos', neg: s.tone === 'neg' }]}>
+              <span class="sr-only">{vi.components.probability} </span>
+              {s.probability}%
+            </span>
+          </header>
+          <p class="range">{s.range}</p>
+          <p class="body">{s.body}</p>
+        </article>
+      ))
+    }
+  </div>
+</figure>
+
+<style>
+  .scenarios { margin-inline: 0; margin-bottom: 0; }
+  .caption { margin-bottom: 10px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--line-strong);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 14px 16px 16px;
+  }
+  .card.pos { border-top-color: var(--up); }
+  .card.neg { border-top-color: var(--down); }
+  .card.neu { border-top-color: var(--accent); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  h4 { margin: 0 !important; font-size: 1.15rem; }
+  .range {
+    margin-top: 10px;
+    font: 500 15px/1.3 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .body { margin-top: 8px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+</style>

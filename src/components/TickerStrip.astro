@@ -1,0 +1,119 @@
+---
+/*
+ * Hairline grid of market figures. Values count up on first view.
+ *
+ * <TickerStrip items={[
+ *   { key: 'VN-Index', value: 1775.09, decimals: 2, delta: '−26,56 · −1,47%', dir: 'down' },
+ * ]} />
+ */
+import { arrow, formatNumber, type Direction } from '../lib/format';
+import { vi } from '../i18n/vi';
+
+export interface TickerItem {
+  key: string;
+  /** One number, or several joined by `sep` (e.g. breadth "142 / 298"). */
+  value: number | number[];
+  decimals?: number;
+  signed?: boolean;
+  sep?: string;
+  unit?: string;
+  delta?: string;
+  dir?: Direction;
+  /** Colour the main value by direction as well (with its sign). */
+  tone?: Direction;
+}
+
+interface Props {
+  items: TickerItem[];
+  caption?: string;
+  label?: string;
+}
+const { items, caption, label = vi.ticker.label } = Astro.props;
+---
+
+<figure class="ticker-fig keep">
+  <div class="ticker" role="list" aria-label={label}>
+    {
+      items.map((item) => {
+        const values = Array.isArray(item.value) ? item.value : [item.value];
+        const decimals = item.decimals ?? 0;
+        return (
+          <div class="tile" role="listitem">
+            <span class="k">{item.key}</span>
+            <span class:list={['v', item.tone]}>
+              {values.map((v, i) => (
+                <>
+                  {i > 0 && <span class="sep">{item.sep ?? ' / '}</span>}
+                  <span data-count={v} data-decimals={decimals} data-signed={item.signed ? '' : undefined}>
+                    {formatNumber(v, decimals, item.signed)}
+                  </span>
+                </>
+              ))}
+              {item.unit && <span class="unit">{item.unit}</span>}
+            </span>
+            {item.delta && (
+              <span class:list={['d', item.dir ?? 'flat']}>
+                {item.dir && item.dir !== 'flat' && <span aria-hidden="true">{arrow(item.dir)} </span>}
+                {item.delta}
+              </span>
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+  {caption && <figcaption class="caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .ticker-fig { margin-inline: 0; margin-bottom: 0; }
+  /* Hairline grid: 1px gaps show --line through. Flex-wrap (rather than an
+     auto-fit grid) lets a wrapped last row stretch, so no empty grey cells. */
+  .ticker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .tile {
+    flex: 1 1 150px;
+    background: var(--surface);
+    padding: 14px 16px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .k {
+    font: 500 10.5px/1.3 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3-text);
+  }
+  .v {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 1.62rem;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .v.up { color: var(--up-text); }
+  .v.down { color: var(--down-text); }
+  .v.flat { color: var(--ink); }
+  .sep { color: var(--ink-3); }
+  .unit {
+    font: 400 11px/1 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+    margin-left: 6px;
+  }
+  .d {
+    font: 500 11.5px/1.35 var(--font-mono);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  figcaption { margin-top: 8px; }
+</style>

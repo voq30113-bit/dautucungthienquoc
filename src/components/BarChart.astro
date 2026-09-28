@@ -1,0 +1,92 @@
+---
+/*
+ * Pure-CSS horizontal bars.
+ *
+ * <BarChart caption="Tỷ trọng giá trị giao dịch theo ngành (%)" unit="%"
+ *   items={[{ label: 'Ngân hàng', value: 24.6, tone: 'accent' }]} note="Nguồn: HOSE" />
+ */
+import { formatNumber } from '../lib/format';
+
+interface Item {
+  label: string;
+  value: number;
+  /** Text shown at the right; defaults to the formatted value + unit. */
+  display?: string;
+  tone?: 'accent' | 'warn' | 'neutral';
+}
+interface Props {
+  caption: string;
+  items: Item[];
+  max?: number;
+  unit?: string;
+  decimals?: number;
+  note?: string;
+}
+const { caption, items, unit = '', decimals = 1, note } = Astro.props;
+const max = Astro.props.max ?? (Math.max(...items.map((i) => Math.abs(i.value)), 0) || 1);
+---
+
+<figure class="bars keep" data-reveal-bars>
+  <figcaption class="caption">{caption}</figcaption>
+  <ul class="rows">
+    {
+      items.map((item, i) => {
+        const pct = Math.max(0, Math.min(100, (Math.abs(item.value) / max) * 100));
+        const label = item.display ?? `${formatNumber(item.value, decimals)}${unit}`;
+        return (
+          <li class="row" style={`--i:${Math.min(i, 5)}`}>
+            <span class="lab">{item.label}</span>
+            <span class="track" aria-hidden="true">
+              <span class:list={['fill', item.tone ?? 'accent']} style={`width:${pct.toFixed(2)}%`} />
+            </span>
+            <span class="val">{label}</span>
+          </li>
+        );
+      })
+    }
+  </ul>
+  {note && <p class="note">{note}</p>}
+</figure>
+
+<style>
+  .bars { margin-inline: 0; margin-bottom: 0; }
+  .rows { list-style: none; margin-top: 10px; border-top: 1px solid var(--line); }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(120px, 34%) 1fr 56px;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .lab { font-size: 14px; line-height: 1.35; }
+  .track { display: block; height: 16px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+  .fill {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transform-origin: left center;
+  }
+  .fill.warn { background: var(--warn); }
+  .fill.neutral { background: var(--ink-3); }
+  .val {
+    text-align: right;
+    font: 500 13px/1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .note { margin-top: 8px; font-size: 12.5px; color: var(--ink-2); max-width: 68ch; }
+
+  /* Motion: armed by JS, filled on first view. Static when JS or motion is off. */
+  .bars:global(.bars-armed) .fill { transform: scaleX(0); }
+  .bars:global(.bars-armed.bars-in) .fill {
+    transform: scaleX(1);
+    transition: transform 700ms var(--ease-out) calc(var(--i, 0) * 70ms);
+  }
+
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr 56px; gap: 6px 12px; }
+    .lab { grid-column: 1 / -1; }
+  }
+</style>

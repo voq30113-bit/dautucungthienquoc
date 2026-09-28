@@ -1,0 +1,58 @@
+---
+/*
+ * <SourceList items={[{ label: 'HOSE — Thống kê giao dịch', url: 'https://…' }]} />
+ * Used automatically by the article layout from frontmatter `sources`.
+ */
+interface Props {
+  items: { label: string; url?: string }[];
+}
+const { items } = Astro.props;
+---
+
+<ol class="sources">
+  {
+    items.map((s) => (
+      <li>
+        {s.url ? (
+          <a href={s.url} rel="noopener" target="_blank">
+            {s.label}
+          </a>
+        ) : (
+          s.label
+        )}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .sources {
+    columns: 2;
+    column-gap: 32px;
+    list-style: none;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    counter-reset: src;
+  }
+  li {
+    break-inside: avoid;
+    padding: 6px 0 6px 28px;
+    position: relative;
+    border-top: 1px solid var(--line);
+    counter-increment: src;
+  }
+  li::before {
+    content: counter(src, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 6px;
+    font: 500 10.5px/1.9 var(--font-mono);
+    color: var(--ink-3-text);
+  }
+  a { color: var(--ink-2); overflow-wrap: anywhere; }
+  a:hover { color: var(--accent); }
+  @media (max-width: 640px) {
+    .sources { columns: 1; }
+  }
+</style>

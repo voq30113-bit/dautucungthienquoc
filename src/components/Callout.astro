@@ -1,0 +1,38 @@
+---
+/*
+ * <Callout tag="Điểm nhấn" tone="warn">Nội dung…</Callout>
+ */
+interface Props {
+  tag?: string;
+  tone?: 'accent' | 'warn' | 'down';
+}
+const { tag, tone = 'accent' } = Astro.props;
+---
+
+<aside class:list={['callout', `callout-${tone}`]}>
+  {tag && <p class="tag">{tag}</p>}
+  <div class="body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 18px;
+    max-width: 68ch;
+  }
+  .callout-warn { background: var(--warn-soft); border-left-color: var(--warn); }
+  .callout-down { background: var(--down-soft); border-left-color: var(--down); }
+  .tag {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .callout-warn .tag { color: var(--warn-text); }
+  .callout-down .tag { color: var(--down-text); }
+  .body > :global(* + *) { margin-top: 0.6em; }
+  .body :global(p) { max-width: none; }
+</style>

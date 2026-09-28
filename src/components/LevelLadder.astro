@@ -1,0 +1,68 @@
+---
+/*
+ * Support / resistance map, highest level first. Mark the current price with `here`.
+ *
+ * <LevelLadder caption="Bản đồ hỗ trợ – kháng cự VN-Index" levels={[
+ *   { level: 1820, label: 'Kháng cự mạnh', note: 'Đỉnh tháng 8' },
+ *   { level: 1775, label: 'Đóng cửa', here: true },
+ * ]} />
+ */
+import { formatNumber } from '../lib/format';
+import { vi } from '../i18n/vi';
+
+interface Level {
+  level: number | string;
+  label: string;
+  note?: string;
+  here?: boolean;
+}
+interface Props {
+  caption: string;
+  levels: Level[];
+  decimals?: number;
+}
+const { caption, levels, decimals = 0 } = Astro.props;
+---
+
+<figure class="ladder keep">
+  <figcaption class="caption">{caption}</figcaption>
+  <ol class="rungs" data-reveal-stagger>
+    {
+      levels.map((l) => (
+        <li class:list={['rung', { here: l.here }]} aria-current={l.here ? 'true' : undefined}>
+          <span class="lv">{typeof l.level === 'number' ? formatNumber(l.level, decimals) : l.level}</span>
+          <span class="desc">
+            <span class="lab">
+              {l.label}
+              {l.here && <span class="sr-only"> ({vi.components.current})</span>}
+            </span>
+            {l.note && <span class="note">{l.note}</span>}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .ladder { margin-inline: 0; margin-bottom: 0; max-width: 560px; }
+  .rungs { list-style: none; margin-top: 10px; border: 1px solid var(--line); background: var(--surface); }
+  .rung {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    border-top: 1px solid var(--line);
+  }
+  .rung:first-child { border-top: 0; }
+  .lv {
+    background: var(--surface-2);
+    text-align: right;
+    padding: 9px 12px;
+    font: 500 13px/1.4 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .desc { padding: 9px 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+  .lab { font-size: 14px; font-weight: 500; }
+  .note { font-size: 13px; color: var(--ink-2); }
+  .here .lv, .here .desc { background: var(--accent); color: var(--on-accent); }
+  .here .note { color: var(--on-accent); opacity: 0.85; }
+</style>
