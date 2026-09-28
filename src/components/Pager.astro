@@ -1,0 +1,82 @@
+---
+/*
+ * Previous / next navigation. Takes either two entries (article pages)
+ * or two plain links (index pagination).
+ */
+import { vi } from '../i18n/vi';
+
+interface Link {
+  href: string;
+  title: string;
+}
+interface Props {
+  prev?: Link;
+  next?: Link;
+  prevLabel?: string;
+  nextLabel?: string;
+  label?: string;
+}
+const { prev, next, prevLabel = vi.ui.prev, nextLabel = vi.ui.next, label = vi.ui.pagination } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="pager" aria-label={label}>
+      <div class="cell prev">
+        {prev && (
+          <a href={prev.href} class="plain" rel="prev">
+            <span class="dir">← {prevLabel}</span>
+            <span class="t">{prev.title}</span>
+          </a>
+        )}
+      </div>
+      <div class="cell next">
+        {next && (
+          <a href={next.href} class="plain" rel="next">
+            <span class="dir">{nextLabel} →</span>
+            <span class="t">{next.title}</span>
+          </a>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border-block: 1px solid var(--line);
+    margin-top: 46px;
+  }
+  .cell { background: var(--paper); min-width: 0; }
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+    padding: 16px 18px 18px;
+    transition: background-color var(--dur-micro) var(--ease-std);
+  }
+  a:hover { background: var(--surface); }
+  .next a { text-align: right; align-items: flex-end; }
+  .dir {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .t {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  @media (max-width: 640px) {
+    .pager { grid-template-columns: 1fr; }
+    .next a { text-align: left; align-items: flex-start; }
+    .cell:empty { display: none; }
+  }
+</style>

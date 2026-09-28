@@ -1,0 +1,33 @@
+---
+import { render } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import * as components from '../../components/mdx';
+import { COLLECTIONS, type Entry, getEntries } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const collection of COLLECTIONS) {
+    const entries = await getEntries(collection);
+    entries.forEach((entry, i) => {
+      paths.push({
+        params: { collection, slug: entry.id },
+        // Lists are newest-first: "previous" is the older piece.
+        props: { entry, prev: entries[i + 1], next: entries[i - 1] },
+      });
+    });
+  }
+  return paths;
+}
+
+interface Props {
+  entry: Entry;
+  prev?: Entry;
+  next?: Entry;
+}
+const { entry, prev, next } = Astro.props;
+const { Content, headings } = await render(entry);
+---
+
+<ArticleLayout entry={entry} headings={headings} prev={prev} next={next}>
+  <Content components={components} />
+</ArticleLayout>

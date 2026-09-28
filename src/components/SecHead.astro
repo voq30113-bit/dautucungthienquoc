@@ -1,0 +1,20 @@
+---
+/*
+ * Section head: Roman numeral beside an h2, over a strong hairline.
+ * <SecHead n={1} title="Tiêu điểm" id="tieu-diem"><a slot="aside" href="…">Xem tất cả</a></SecHead>
+ */
+import { toRoman } from '../lib/format';
+
+interface Props {
+  n: number;
+  title: string;
+  id?: string;
+}
+const { n, title, id } = Astro.props;
+---
+
+<div class="sec-head">
+  <span class="numeral" aria-hidden="true">{toRoman(n)}</span>
+  <h2 id={id}>{title}</h2>
+  {Astro.slots.has('aside') && <span class="aside"><slot name="aside" /></span>}
+</div>

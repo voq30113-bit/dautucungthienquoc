@@ -1,0 +1,14 @@
+---
+import CollectionIndex from '../../components/CollectionIndex.astro';
+import { COLLECTIONS, PAGE_SIZE, type Key, getEntries } from '../../lib/content';
+
+export function getStaticPaths() {
+  return COLLECTIONS.map((collection) => ({ params: { collection } }));
+}
+
+const collection = Astro.params.collection as Key;
+const all = await getEntries(collection);
+const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+---
+
+<CollectionIndex collection={collection} entries={all.slice(0, PAGE_SIZE)} page={1} totalPages={totalPages} />

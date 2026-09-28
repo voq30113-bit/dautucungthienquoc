@@ -1,0 +1,32 @@
+---
+import CollectionIndex from '../../../components/CollectionIndex.astro';
+import { COLLECTIONS, PAGE_SIZE, type Entry, type Key, getEntries } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const collection of COLLECTIONS) {
+    const all = await getEntries(collection);
+    const totalPages = Math.ceil(all.length / PAGE_SIZE);
+    for (let page = 2; page <= totalPages; page++) {
+      paths.push({
+        params: { collection, page: String(page) },
+        props: { entries: all.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), totalPages },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  entries: Entry[];
+  totalPages: number;
+}
+const { entries, totalPages } = Astro.props;
+---
+
+<CollectionIndex
+  collection={Astro.params.collection as Key}
+  entries={entries}
+  page={Number(Astro.params.page)}
+  totalPages={totalPages}
+/>

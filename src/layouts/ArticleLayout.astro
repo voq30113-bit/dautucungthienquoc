@@ -1,0 +1,175 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TickerStrip from '../components/TickerStrip.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import SourceList from '../components/SourceList.astro';
+import SecHead from '../components/SecHead.astro';
+import Pager from '../components/Pager.astro';
+import { vi } from '../i18n/vi';
+import { type Entry, absolute, dataDate, entryHref, entryPath, href, readingTime, vtName } from '../lib/content';
+import { formatDate } from '../lib/format';
+import { marketTicker } from '../lib/market';
+
+interface Props {
+  entry: Entry;
+  headings: { depth: number; slug: string; text: string }[];
+  prev?: Entry;
+  next?: Entry;
+}
+const { entry, headings, prev, next } = Astro.props;
+const { data } = entry;
+const meta = vi.collections[entry.collection];
+
+const sectionHeads = headings.filter((h) => h.depth === 2);
+const sourcesSlug = 'nguon-tham-khao';
+const toc = [...sectionHeads, ...(data.sources.length ? [{ slug: sourcesSlug, text: vi.ui.sources }] : [])];
+
+const eyebrow = data.eyebrow ?? `${meta.singular} · ${vi.ui.marketVietnam} · ${formatDate(dataDate(entry))}`;
+const minutes = readingTime(entry);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: data.title,
+  description: data.standfirst,
+  datePublished: data.date.toISOString(),
+  dateModified: data.date.toISOString(),
+  inLanguage: 'vi-VN',
+  articleSection: meta.title,
+  keywords: data.tags.join(', ') || undefined,
+  mainEntityOfPage: absolute(entryPath(entry), Astro.site),
+  author: { '@type': 'Person', name: vi.site.author },
+  publisher: { '@type': 'Organization', name: vi.site.name, url: absolute('', Astro.site) },
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.standfirst}
+  path={entryPath(entry)}
+  type="article"
+  publishedTime={data.date}
+  section={meta.title}
+  tags={data.tags}
+  jsonLd={jsonLd}
+>
+  <ReadingProgress slot="top" />
+
+  <article class="article" data-progress-target>
+    <header class="wrap art-head" data-pagefind-body>
+      <p class="eyebrow" data-pagefind-ignore>
+        <a class="plain crumb" href={href(`${entry.collection}/`)} data-pagefind-meta="type">{meta.singular}</a>
+        {eyebrow.startsWith(meta.singular) ? eyebrow.slice(meta.singular.length) : ` · ${eyebrow}`}
+      </p>
+      <h1 transition:name={vtName(entry)} data-pagefind-meta="title">{data.title}</h1>
+      <p class="standfirst">{data.standfirst}</p>
+      <p class="byline" data-pagefind-ignore>
+        <span>{vi.site.author}</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span>{vi.ui.published} <time datetime={data.date.toISOString()} data-pagefind-meta="date">{formatDate(data.date)}</time></span>
+        {
+          data.sessionDate && (
+            <>
+              <span class="dot" aria-hidden="true">·</span>
+              <span>{vi.ui.session} {formatDate(data.sessionDate)}</span>
+            </>
+          )
+        }
+        <span class="dot" aria-hidden="true">·</span>
+        <span>{vi.ui.readingTime(minutes)}</span>
+      </p>
+      {
+        (data.revision || data.draft) && (
+          <p class="chips" data-pagefind-ignore>
+            {data.revision && <span class="pill accent">{vi.ui.revision} · {data.revision}</span>}
+            {data.draft && <span class="pill draft">{vi.ui.draft}</span>}
+          </p>
+        )
+      }
+    </header>
+
+    {
+      data.market && (
+        <div class="wrap art-ticker" data-pagefind-ignore>
+          <TickerStrip items={marketTicker(data.market)} caption={`VN-Index · ${vi.ui.session} ${formatDate(dataDate(entry))}`} />
+        </div>
+      )
+    }
+
+    <div class="wrap art-grid">
+      <div class="art-main">
+        <div class="prose" data-pagefind-body>
+          <slot />
+        </div>
+
+        {
+          data.sources.length > 0 && (
+            <section class="section sources-sec" aria-labelledby={sourcesSlug} data-pagefind-ignore>
+              <SecHead n={sectionHeads.length + 1} title={vi.ui.sources} id={sourcesSlug} />
+              <SourceList items={data.sources} />
+            </section>
+          )
+        }
+
+        <aside class="disclaimer" aria-label={vi.disclaimer.title} data-pagefind-ignore>
+          <p class="tag">{vi.disclaimer.title}</p>
+          <p>{vi.disclaimer.text}</p>
+        </aside>
+      </div>
+      {toc.length > 1 && <TableOfContents headings={toc} />}
+    </div>
+  </article>
+
+  <div class="wrap no-print">
+    <Pager
+      prev={prev && { href: entryHref(prev), title: prev.data.title }}
+      next={next && { href: entryHref(next), title: next.data.title }}
+    />
+  </div>
+</BaseLayout>
+
+<style>
+  .art-head { padding-top: 44px; }
+  .art-head .eyebrow { margin-bottom: 18px; }
+  .crumb { color: var(--accent); }
+  .crumb:hover { background-size: 100% 1px; }
+  .art-head h1 { max-width: 20ch; }
+  .art-head .standfirst { margin-top: 18px; }
+  .byline {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+  }
+  .dot { color: var(--ink-3); }
+  .chips { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .art-ticker { margin-top: 28px; }
+
+  .art-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) {
+    .art-grid { grid-template-columns: minmax(0, 1fr) 196px; gap: 48px; }
+  }
+  .art-main { min-width: 0; }
+  .prose > :global(*:first-child:not(h2)) { margin-top: 32px; }
+
+  .disclaimer {
+    margin-top: 46px;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--line-strong);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 78ch;
+  }
+  .disclaimer .tag {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3-text);
+    margin-bottom: 6px;
+  }
+</style>

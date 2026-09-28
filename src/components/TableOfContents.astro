@@ -1,0 +1,134 @@
+---
+/*
+ * Sticky table of contents built from the article's h2s. Shown ≥1024px.
+ */
+import { vi } from '../i18n/vi';
+import { toRoman } from '../lib/format';
+
+interface Props {
+  headings: { slug: string; text: string }[];
+}
+const { headings } = Astro.props;
+---
+
+<nav class="toc" aria-label={vi.ui.toc} data-toc>
+  <p class="toc-title">{vi.ui.toc}</p>
+  <ol>
+    {
+      headings.map((h, i) => (
+        <li>
+          <a href={`#${h.slug}`} class="plain" data-toc-link={h.slug}>
+            <span class="n">{toRoman(i + 1)}</span>
+            <span class="t">{h.text}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script>
+  let cleanup: (() => void) | null = null;
+
+  function init() {
+    cleanup?.();
+    cleanup = null;
+    const toc = document.querySelector<HTMLElement>('[data-toc]');
+    if (!toc || getComputedStyle(toc).display === 'none') return;
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+    const targets = links
+      .map((a) => document.getElementById(a.dataset.tocLink!))
+      .filter((el): el is HTMLElement => !!el);
+    if (!targets.length) return;
+
+    let activeId = '';
+    let queued = false;
+    // Active section = last heading above the reading line (35% down the viewport).
+    // Reads all positions first, then writes at most two attributes.
+    const pick = () => {
+      queued = false;
+      const lineY = window.innerHeight * 0.35;
+      let current = targets[0].id;
+      for (const t of targets) {
+        if (t.getBoundingClientRect().top <= lineY) current = t.id;
+        else break;
+      }
+      // At the very bottom the last section may never reach the line.
+      const doc = document.documentElement;
+      if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) current = targets[targets.length - 1].id;
+      if (current === activeId) return;
+      activeId = current;
+      for (const a of links) {
+        if (a.dataset.tocLink === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      }
+    };
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(pick);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    pick();
+    cleanup = () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }
+
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:before-swap', () => cleanup?.());
+</script>
+
+<style>
+  .toc {
+    display: none;
+    position: sticky;
+    top: calc(var(--mast-condensed) + 28px);
+    align-self: start;
+    max-height: calc(100vh - var(--mast-condensed) - 56px);
+    overflow-y: auto;
+    padding-top: 46px;
+  }
+  @media (min-width: 1024px) {
+    .toc { display: block; }
+  }
+  .toc-title {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3-text);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  ol { list-style: none; }
+  li { border-bottom: 1px solid var(--line); }
+  a {
+    position: relative;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 6px;
+    padding: 8px 0 8px 10px;
+    font: 400 12px/1.45 var(--font-mono);
+    letter-spacing: 0.01em;
+    color: var(--ink-2);
+    transition: color var(--dur-micro) var(--ease-std);
+  }
+  a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform var(--dur-micro) var(--ease-std);
+  }
+  a:hover { color: var(--ink); }
+  a[aria-current] { color: var(--ink); }
+  a[aria-current]::before { transform: scaleY(1); }
+  .n { color: var(--accent); font-weight: 600; }
+</style>

@@ -1,0 +1,95 @@
+---
+/*
+ * One article in a list: mono date column, headline, standfirst, meta.
+ */
+import { vi } from '../i18n/vi';
+import { type Entry, entryHref, readingTime, vtName } from '../lib/content';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  entry: Entry;
+  /** Show the collection label (mixed lists). */
+  showType?: boolean;
+  /** Give the headline its shared-element transition name (must be unique per page). */
+  vt?: boolean;
+  headingLevel?: 2 | 3;
+}
+const { entry, showType = false, vt = true, headingLevel = 2 } = Astro.props;
+const { data } = entry;
+---
+
+<article class="row">
+  <div class="when">
+    <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+    {showType && <span class="type">{vi.collections[entry.collection].label}</span>}
+  </div>
+  <div class="what">
+    {
+      headingLevel === 2 ? (
+        <h2 class="title" transition:name={vt ? vtName(entry) : undefined}>
+          <a href={entryHref(entry)}>{data.title}</a>
+        </h2>
+      ) : (
+        <h3 class="title" transition:name={vt ? vtName(entry) : undefined}>
+          <a href={entryHref(entry)}>{data.title}</a>
+        </h3>
+      )
+    }
+    <p class="sf">{data.standfirst}</p>
+    <p class="meta">
+      {vi.ui.readingTime(readingTime(entry))}
+      {data.revision && <span class="pill soft">{vi.ui.revision}</span>}
+      {data.draft && <span class="pill draft">{vi.ui.draft}</span>}
+    </p>
+  </div>
+</article>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 124px minmax(0, 1fr);
+    gap: 6px 24px;
+    padding: 20px 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .when {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font: 400 11.5px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.35em;
+  }
+  .type {
+    font-weight: 500;
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.008em;
+    text-wrap: balance;
+  }
+  .title a { display: inline; }
+  .sf { margin-top: 6px; color: var(--ink-2); font-size: 15px; line-height: 1.6; max-width: 68ch; }
+  .meta {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font: 400 11.5px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; padding: 16px 0 18px; }
+    .when { flex-direction: row; gap: 12px; padding-top: 0; }
+  }
+</style>
