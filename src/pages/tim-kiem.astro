@@ -18,6 +18,8 @@ import { href } from '../lib/content';
       action={href('tim-kiem/')}
       method="get"
       data-search-form
+      data-base={import.meta.env.BASE_URL}
+      data-dev={String(import.meta.env.DEV)}
       data-msg-idle={vi.search.idle}
       data-msg-loading={vi.search.loading}
       data-msg-none={vi.search.none}
@@ -37,52 +39,43 @@ import { href } from '../lib/content';
   </div>
 </BaseLayout>
 
-<script>
-  type PagefindResult = {
-    url: string;
-    excerpt: string;
-    meta: { title?: string; type?: string; date?: string };
-  };
-  type Pagefind = {
-    options: (o: Record<string, unknown>) => Promise<void>;
-    init: () => void;
-    debouncedSearch: (q: string) => Promise<{ results: { data: () => Promise<PagefindResult> }[] } | null>;
-  };
-
-  const BASE = import.meta.env.BASE_URL.replace(/\/+$/, '');
-  let pagefind: Pagefind | null = null;
-
-  async function load(): Promise<Pagefind | null> {
-    if (pagefind) return pagefind;
-    if (import.meta.env.DEV) return null; // index exists only in the production build
-    try {
-      const url = `${BASE}/pagefind/pagefind.js`;
-      const mod = (await import(/* @vite-ignore */ url)) as Pagefind;
-      await mod.options({ baseUrl: `${BASE}/`, excerptLength: 24 });
-      mod.init();
-      pagefind = mod;
-      return mod;
-    } catch {
-      return null;
-    }
-  }
-
-  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string) {
-    const node = document.createElement(tag);
-    node.className = cls;
-    if (text) node.textContent = text;
-    return node;
-  }
-
-  function init() {
-    const form = document.querySelector<HTMLFormElement>('[data-search-form]');
-    if (!form) return;
-    const input = form.querySelector<HTMLInputElement>('input[name="q"]')!;
-    const status = document.querySelector<HTMLElement>('[data-search-status]')!;
-    const list = document.querySelector<HTMLOListElement>('[data-search-results]')!;
+<!--
+  is:inline keeps Vite from rewriting the runtime import() of Pagefind's
+  bundle, which only exists in the production build (dist/pagefind/).
+  ClientRouter re-executes this script each time the search page is shown.
+-->
+<script is:inline type="module" data-astro-rerun>
+  const form = document.querySelector('[data-search-form]');
+  if (form) {
     const msg = form.dataset;
+    const BASE = (msg.base || '').replace(/\/+$/, '');
+    const input = form.querySelector('input[name="q"]');
+    const status = document.querySelector('[data-search-status]');
+    const list = document.querySelector('[data-search-results]');
+    let pagefind = null;
 
-    const run = async (q: string) => {
+    const load = async () => {
+      if (pagefind) return pagefind;
+      if (msg.dev === 'true') return null; // index exists only in the production build
+      try {
+        const mod = await import(`${BASE}/pagefind/pagefind.js`);
+        await mod.options({ baseUrl: `${BASE}/`, excerptLength: 24 });
+        mod.init();
+        pagefind = mod;
+        return mod;
+      } catch {
+        return null;
+      }
+    };
+
+    const el = (tag, cls, text) => {
+      const node = document.createElement(tag);
+      node.className = cls;
+      if (text) node.textContent = text;
+      return node;
+    };
+
+    const run = async (q) => {
       const query = q.trim();
       const url = new URL(location.href);
       if (query) url.searchParams.set('q', query);
@@ -91,13 +84,13 @@ import { href } from '../lib/content';
 
       if (!query) {
         list.replaceChildren();
-        status.textContent = msg.msgIdle ?? '';
+        status.textContent = msg.msgIdle;
         return;
       }
-      status.textContent = msg.msgLoading ?? '';
+      status.textContent = msg.msgLoading;
       const pf = await load();
       if (!pf) {
-        status.textContent = msg.msgUnavailable ?? '';
+        status.textContent = msg.msgUnavailable;
         return;
       }
       const search = await pf.debouncedSearch(query);
@@ -110,16 +103,14 @@ import { href } from '../lib/content';
           a.href = r.url;
           const meta = [r.meta.type, r.meta.date].filter(Boolean).join(' · ');
           if (meta) a.append(el('span', 'r-meta', meta));
-          a.append(el('span', 'r-title', r.meta.title ?? r.url));
+          a.append(el('span', 'r-title', r.meta.title || r.url));
           const ex = el('p', 'r-ex');
-          ex.innerHTML = r.excerpt; // Pagefind escapes content; only <mark> is added
+          ex.innerHTML = r.excerpt; // Pagefind escapes page text; it only adds <mark>
           li.append(a, ex);
           return li;
         }),
       );
-      status.textContent = data.length
-        ? (msg.msgResults ?? '{n}').replace('{n}', String(search.results.length))
-        : (msg.msgNone ?? '');
+      status.textContent = data.length ? msg.msgResults.replace('{n}', String(search.results.length)) : msg.msgNone;
     };
 
     form.addEventListener('submit', (e) => {
@@ -136,8 +127,6 @@ import { href } from '../lib/content';
       input.focus({ preventScroll: true });
     }
   }
-
-  document.addEventListener('astro:page-load', init);
 </script>
 
 <style>
