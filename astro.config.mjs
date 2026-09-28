@@ -23,4 +23,17 @@ export default defineConfig({
   integrations: [mdx()],
   devToolbar: { enabled: false },
   build: { format: 'directory' },
+  vite: {
+    build: {
+      rolldownOptions: {
+        onLog(level, log, handler) {
+          // Astro marks every MDX content entry with a "use astro:head-inject"
+          // directive that it reads before bundling; rolldown warns it will not
+          // preserve it. Harmless and upstream — drop only that exact warning.
+          if (log.code === 'MODULE_LEVEL_DIRECTIVE' && log.message.includes('astro:head-inject')) return;
+          handler(level, log);
+        },
+      },
+    },
+  },
 });
