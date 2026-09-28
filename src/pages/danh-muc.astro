@@ -1,0 +1,27 @@
+---
+/*
+ * RESERVED — portfolio section. Placeholder only: excluded from nav and
+ * sitemap, marked noindex. See docs/ROADMAP.md before building it.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { vi } from '../i18n/vi';
+import { href } from '../lib/content';
+---
+
+<BaseLayout title={vi.portfolio.title} description={vi.portfolio.body} noindex>
+  <div class="wrap">
+    <header class="index-head">
+      <p class="eyebrow">{vi.portfolio.eyebrow}</p>
+      <h1>{vi.portfolio.title}</h1>
+      <p class="standfirst">{vi.portfolio.body}</p>
+      <p class="back"><a href={href('')}>← {vi.ui.backHome}</a></p>
+    </header>
+  </div>
+</BaseLayout>
+
+<style>
+  .index-head { padding: 44px 0 26px; }
+  .index-head .eyebrow { margin-bottom: 16px; color: var(--warn-text); }
+  .index-head .standfirst { margin-top: 16px; }
+  .back { margin-top: 24px; font: 500 12px/1.4 var(--font-mono); letter-spacing: 0.06em; color: var(--accent); }
+</style>

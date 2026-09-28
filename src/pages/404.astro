@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { vi } from '../i18n/vi';
+import { href } from '../lib/content';
+---
+
+<BaseLayout title={vi.notFound.title} description={vi.notFound.body} path="404/" noindex>
+  <div class="wrap">
+    <header class="index-head">
+      <p class="eyebrow">404</p>
+      <h1>{vi.notFound.title}</h1>
+      <p class="standfirst">{vi.notFound.body} {vi.notFound.hint}</p>
+      <ul class="links">
+        <li><a href={href('')}>{vi.ui.backHome}</a></li>
+        <li><a href={href('luu-tru/')}>{vi.archive.title}</a></li>
+        <li><a href={href('tim-kiem/')}>{vi.search.title}</a></li>
+      </ul>
+    </header>
+  </div>
+</BaseLayout>
+
+<style>
+  .index-head { padding: 64px 0 26px; }
+  .index-head .eyebrow { margin-bottom: 16px; }
+  .index-head .standfirst { margin-top: 16px; }
+  .links {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font: 500 12px/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+</style>

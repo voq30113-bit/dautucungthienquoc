@@ -1,0 +1,283 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TickerStrip from '../components/TickerStrip.astro';
+import SecHead from '../components/SecHead.astro';
+import { vi } from '../i18n/vi';
+import {
+  type Entry,
+  absolute,
+  dataDate,
+  entryHref,
+  getAllEntries,
+  getEntries,
+  href,
+  readingTime,
+  sameEntry,
+  vtName,
+} from '../lib/content';
+import { formatDate } from '../lib/format';
+import { marketTicker } from '../lib/market';
+
+const all = await getAllEntries();
+const [nhanDinh, tongKet, baoCao] = await Promise.all([
+  getEntries('nhan-dinh'),
+  getEntries('tong-ket'),
+  getEntries('bao-cao'),
+]);
+
+// Ticker: newest session wrap-up that carries figures. Never hardcoded.
+const tickerSource = tongKet.find((e) => e.data.market);
+
+// Lead: newest long-form report, unless a newer piece is flagged `featured`.
+const longform = all.filter((e) => e.collection === 'bao-cao' || e.collection === 'phan-tich');
+const featured = all.find((e) => e.data.featured);
+let lead: Entry | undefined = longform[0] ?? all[0];
+if (featured && (!lead || featured.data.date > lead.data.date)) lead = featured;
+
+// Daily split and weekly block skip whatever is already the lead.
+const daily = [nhanDinh.find((e) => !sameEntry(e, lead)), tongKet.find((e) => !sameEntry(e, lead))].filter(
+  (e): e is Entry => !!e,
+);
+const weekly = baoCao.find((e) => !sameEntry(e, lead));
+const recent = all.slice(0, 10);
+
+let n = 0;
+const next = () => ++n;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: vi.site.name,
+    url: absolute('', Astro.site),
+    description: vi.site.description,
+    logo: absolute('favicon.svg', Astro.site),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: vi.site.name,
+    url: absolute('', Astro.site),
+    inLanguage: 'vi-VN',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${absolute('tim-kiem/', Astro.site)}?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
+---
+
+<BaseLayout jsonLd={jsonLd}>
+  <h1 class="sr-only">{vi.home.heading}</h1>
+
+  <section class="wrap home-ticker" aria-label={vi.ticker.label}>
+    {
+      tickerSource?.data.market ? (
+        <TickerStrip
+          items={marketTicker(tickerSource.data.market)}
+          caption={`${vi.home.tickerCaption(formatDate(dataDate(tickerSource)))} · ${vi.home.tickerSource}`}
+        />
+      ) : (
+        <p class="caption">{vi.home.noTicker}</p>
+      )
+    }
+  </section>
+
+  {
+    lead && (
+      <section class="wrap section" aria-labelledby="tieu-diem">
+        <SecHead n={next()} title={vi.home.lead} id="tieu-diem" />
+        <article class="lead">
+          <p class="eyebrow">
+            {vi.collections[lead.collection].singular} · {formatDate(lead.data.date)}
+          </p>
+          <h2 class="lead-title" transition:name={vtName(lead)}>
+            <a href={entryHref(lead)}>{lead.data.title}</a>
+          </h2>
+          <p class="standfirst">{lead.data.standfirst}</p>
+          <p class="byline">
+            {vi.site.author} · {vi.ui.readingTime(readingTime(lead))}
+            {lead.data.draft && <span class="pill draft">{vi.ui.draft}</span>}
+          </p>
+        </article>
+      </section>
+    )
+  }
+
+  {
+    daily.length > 0 && (
+      <section class="wrap section" aria-labelledby="ban-tin">
+        <SecHead n={next()} title={vi.home.daily} id="ban-tin" />
+        <div class="split" data-reveal-stagger>
+          {daily.map((e) => (
+            <article class="card">
+              <p class="eyebrow">
+                <a class="plain" href={href(`${e.collection}/`)}>
+                  {vi.collections[e.collection].label}
+                </a>
+              </p>
+              <h3 class="card-title" transition:name={vtName(e)}>
+                <a href={entryHref(e)}>{e.data.title}</a>
+              </h3>
+              <p class="card-sf">{e.data.standfirst}</p>
+              <p class="byline">
+                <time datetime={e.data.date.toISOString()}>{formatDate(e.data.date)}</time> ·{' '}
+                {vi.ui.readingTime(readingTime(e))}
+                {e.data.draft && <span class="pill draft">{vi.ui.draft}</span>}
+              </p>
+              <a class="more" href={href(`${e.collection}/`)}>
+                {vi.ui.seeAll} →
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    weekly && (
+      <section class="wrap section" aria-labelledby="bao-cao-tuan">
+        <SecHead n={next()} title={lead?.collection === 'bao-cao' ? vi.home.weeklyPrevious : vi.home.weekly} id="bao-cao-tuan">
+          <a slot="aside" href={href('bao-cao/')}>{vi.ui.seeAll}</a>
+        </SecHead>
+        <article class="feature" data-reveal>
+          <div>
+            <p class="eyebrow">{vi.collections['bao-cao'].singular}</p>
+            <h3 class="feature-title" transition:name={vtName(weekly)}>
+              <a href={entryHref(weekly)}>{weekly.data.title}</a>
+            </h3>
+          </div>
+          <div>
+            <p class="standfirst">{weekly.data.standfirst}</p>
+            <p class="byline">
+              {formatDate(weekly.data.date)} · {vi.ui.readingTime(readingTime(weekly))}
+            </p>
+          </div>
+        </article>
+      </section>
+    )
+  }
+
+  <section class="wrap section" aria-labelledby="moi-cap-nhat">
+    <SecHead n={next()} title={vi.home.archive} id="moi-cap-nhat">
+      <a slot="aside" href={href('luu-tru/')}>{vi.home.archiveAll}</a>
+    </SecHead>
+    {
+      recent.length ? (
+        <ol class="recent" data-reveal-stagger>
+          {recent.map((e) => (
+            <li>
+              <time datetime={e.data.date.toISOString()}>{formatDate(e.data.date)}</time>
+              <span class="type">{vi.collections[e.collection].label}</span>
+              <a href={entryHref(e)}>{e.data.title}</a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="caption">{vi.ui.empty}</p>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .home-ticker { padding-top: 28px; }
+
+  .lead { padding-top: 6px; }
+  .lead .eyebrow { margin-bottom: 14px; }
+  .lead-title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(2rem, 5.2vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+  .lead .standfirst { margin-top: 16px; }
+  .lead .byline { margin-top: 16px; display: flex; gap: 10px; align-items: center; }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border-block: 1px solid var(--line);
+  }
+  .card {
+    background: var(--paper);
+    padding: 20px 28px 22px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card + .card { padding: 20px 0 22px 28px; }
+  .card-title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(1.35rem, 2.8vw, 1.62rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .card-sf { color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+  .card .byline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .more {
+    margin-top: auto;
+    align-self: flex-start;
+    font: 500 11px/1.4 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 16px 40px;
+    padding: 6px 0 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .feature .eyebrow { margin-bottom: 12px; }
+  .feature-title {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3.6vw, 2.05rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .feature .byline { margin-top: 12px; }
+
+  .recent { list-style: none; border-top: 1px solid var(--line); }
+  .recent li {
+    display: grid;
+    grid-template-columns: 96px 128px minmax(0, 1fr);
+    gap: 4px 16px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .recent time {
+    font: 400 12px/1.5 var(--font-mono);
+    color: var(--ink-3-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .recent .type {
+    font: 500 10.5px/1.5 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .recent a { font-weight: 500; line-height: 1.45; }
+
+  @media (max-width: 640px) {
+    .split { grid-template-columns: 1fr; }
+    .card, .card + .card { padding: 18px 0 20px; }
+    .feature { grid-template-columns: 1fr; }
+    .recent li { grid-template-columns: auto 1fr; }
+    .recent a { grid-column: 1 / -1; }
+  }
+</style>

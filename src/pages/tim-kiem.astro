@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { vi } from '../i18n/vi';
+import { href } from '../lib/content';
+---
+
+<BaseLayout title={vi.search.title} description={vi.search.description}>
+  <div class="wrap">
+    <header class="index-head">
+      <p class="eyebrow">{vi.search.title}</p>
+      <h1>{vi.search.title}</h1>
+      <p class="standfirst">{vi.search.description}</p>
+    </header>
+
+    <form
+      class="search-form"
+      role="search"
+      action={href('tim-kiem/')}
+      method="get"
+      data-search-form
+      data-msg-idle={vi.search.idle}
+      data-msg-loading={vi.search.loading}
+      data-msg-none={vi.search.none}
+      data-msg-results={vi.search.results(0).replace('0', '{n}')}
+      data-msg-unavailable={vi.search.unavailable}
+    >
+      <label for="q" class="caption">{vi.search.label}</label>
+      <div class="field">
+        <input id="q" name="q" type="search" autocomplete="off" spellcheck="false" placeholder={vi.search.placeholder} />
+        <button type="submit">{vi.search.submit}</button>
+      </div>
+    </form>
+
+    <p class="status" aria-live="polite" data-search-status>{vi.search.idle}</p>
+    <ol class="results" data-search-results></ol>
+    <noscript><p class="status">{vi.search.noscript} <a href={href('luu-tru/')}>{vi.archive.title}</a></p></noscript>
+  </div>
+</BaseLayout>
+
+<script>
+  type PagefindResult = {
+    url: string;
+    excerpt: string;
+    meta: { title?: string; type?: string; date?: string };
+  };
+  type Pagefind = {
+    options: (o: Record<string, unknown>) => Promise<void>;
+    init: () => void;
+    debouncedSearch: (q: string) => Promise<{ results: { data: () => Promise<PagefindResult> }[] } | null>;
+  };
+
+  const BASE = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  let pagefind: Pagefind | null = null;
+
+  async function load(): Promise<Pagefind | null> {
+    if (pagefind) return pagefind;
+    if (import.meta.env.DEV) return null; // index exists only in the production build
+    try {
+      const url = `${BASE}/pagefind/pagefind.js`;
+      const mod = (await import(/* @vite-ignore */ url)) as Pagefind;
+      await mod.options({ baseUrl: `${BASE}/`, excerptLength: 24 });
+      mod.init();
+      pagefind = mod;
+      return mod;
+    } catch {
+      return null;
+    }
+  }
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string) {
+    const node = document.createElement(tag);
+    node.className = cls;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function init() {
+    const form = document.querySelector<HTMLFormElement>('[data-search-form]');
+    if (!form) return;
+    const input = form.querySelector<HTMLInputElement>('input[name="q"]')!;
+    const status = document.querySelector<HTMLElement>('[data-search-status]')!;
+    const list = document.querySelector<HTMLOListElement>('[data-search-results]')!;
+    const msg = form.dataset;
+
+    const run = async (q: string) => {
+      const query = q.trim();
+      const url = new URL(location.href);
+      if (query) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      history.replaceState(history.state, '', url);
+
+      if (!query) {
+        list.replaceChildren();
+        status.textContent = msg.msgIdle ?? '';
+        return;
+      }
+      status.textContent = msg.msgLoading ?? '';
+      const pf = await load();
+      if (!pf) {
+        status.textContent = msg.msgUnavailable ?? '';
+        return;
+      }
+      const search = await pf.debouncedSearch(query);
+      if (!search) return; // superseded by a newer keystroke
+      const data = await Promise.all(search.results.slice(0, 20).map((r) => r.data()));
+      list.replaceChildren(
+        ...data.map((r) => {
+          const li = el('li', 'result');
+          const a = el('a', 'r-link');
+          a.href = r.url;
+          const meta = [r.meta.type, r.meta.date].filter(Boolean).join(' · ');
+          if (meta) a.append(el('span', 'r-meta', meta));
+          a.append(el('span', 'r-title', r.meta.title ?? r.url));
+          const ex = el('p', 'r-ex');
+          ex.innerHTML = r.excerpt; // Pagefind escapes content; only <mark> is added
+          li.append(a, ex);
+          return li;
+        }),
+      );
+      status.textContent = data.length
+        ? (msg.msgResults ?? '{n}').replace('{n}', String(search.results.length))
+        : (msg.msgNone ?? '');
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      run(input.value);
+    });
+    input.addEventListener('input', () => run(input.value));
+
+    const initial = new URLSearchParams(location.search).get('q');
+    if (initial) {
+      input.value = initial;
+      run(initial);
+    } else {
+      input.focus({ preventScroll: true });
+    }
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .index-head { padding: 44px 0 26px; border-bottom: 1px solid var(--line-strong); }
+  .index-head .eyebrow { margin-bottom: 16px; }
+  .index-head .standfirst { margin-top: 16px; }
+  .search-form { padding-top: 28px; max-width: 640px; }
+  .field { display: flex; margin-top: 8px; }
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--line-strong);
+    border-right: 0;
+    border-radius: var(--radius) 0 0 var(--radius);
+    background: var(--surface);
+    font-size: 16px;
+  }
+  input:focus-visible { outline-offset: -2px; }
+  button {
+    padding: 0 20px;
+    border: 1px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--accent);
+    color: var(--on-accent);
+    font: 500 12px/1 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .status {
+    margin-top: 18px;
+    font: 400 11.5px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+  .results { list-style: none; margin-top: 12px; border-top: 1px solid var(--line); }
+  .results :global(.result) { padding: 16px 0 18px; border-bottom: 1px solid var(--line); }
+  .results :global(.r-link) { display: flex; flex-direction: column; gap: 4px; background-image: none; }
+  .results :global(.r-meta) {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .results :global(.r-title) {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    line-height: 1.2;
+    font-weight: 500;
+  }
+  .results :global(.r-link:hover .r-title) { color: var(--accent); }
+  .results :global(.r-ex) { margin-top: 6px; color: var(--ink-2); font-size: 15px; max-width: 68ch; }
+  .results :global(mark) { background: var(--accent-soft); color: var(--ink); padding: 0 2px; }
+</style>

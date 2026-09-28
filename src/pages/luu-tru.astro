@@ -1,0 +1,202 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SecHead from '../components/SecHead.astro';
+import { vi } from '../i18n/vi';
+import { COLLECTIONS, type Entry, entryHref, getAllEntries } from '../lib/content';
+import { formatDate, pad2, yearMonth } from '../lib/format';
+
+const all = await getAllEntries();
+const groups = new Map<string, { label: string; entries: Entry[] }>();
+for (const e of all) {
+  const { year, month } = yearMonth(e.data.date);
+  const key = `${year}-${pad2(month)}`;
+  if (!groups.has(key)) groups.set(key, { label: vi.archive.month(month, year), entries: [] });
+  groups.get(key)!.entries.push(e);
+}
+const months = [...groups.entries()];
+---
+
+<BaseLayout title={vi.archive.title} description={vi.archive.description}>
+  <div class="wrap">
+    <header class="index-head">
+      <p class="eyebrow">{vi.archive.title}</p>
+      <h1>{vi.archive.title}</h1>
+      <p class="standfirst">{vi.archive.description}</p>
+    </header>
+
+    <div class="filters" data-archive-filters data-count-tpl={vi.archive.count(0).replace('0', '{n}')} hidden>
+      <div class="f-group" role="group" aria-label={vi.archive.filterType}>
+        <span class="f-label" aria-hidden="true">{vi.archive.filterType}</span>
+        <button type="button" class="chip" data-type="" aria-pressed="true">{vi.archive.all}</button>
+        {
+          COLLECTIONS.map((c) => (
+            <button type="button" class="chip" data-type={c} aria-pressed="false">
+              {vi.collections[c].label}
+            </button>
+          ))
+        }
+      </div>
+      <label class="f-group">
+        <span class="f-label">{vi.archive.filterMonth}</span>
+        <select data-month>
+          <option value="">{vi.archive.allMonths}</option>
+          {months.map(([key, g]) => <option value={key}>{g.label}</option>)}
+        </select>
+      </label>
+      <p class="f-count" aria-live="polite" data-archive-count>{vi.archive.count(all.length)}</p>
+    </div>
+
+    {all.length === 0 && <p class="empty">{vi.ui.empty}</p>}
+    <p class="empty" data-archive-none hidden>{vi.archive.none}</p>
+
+    {
+      months.map(([key, g], i) => (
+        <section class="section month" data-month-group={key} aria-labelledby={`m-${key}`}>
+          <SecHead n={i + 1} title={g.label} id={`m-${key}`}>
+            <span slot="aside" data-month-count>{vi.archive.count(g.entries.length)}</span>
+          </SecHead>
+          <ol class="items">
+            {g.entries.map((e) => (
+              <li data-type={e.collection}>
+                <time datetime={e.data.date.toISOString()}>{formatDate(e.data.date)}</time>
+                <span class="type">{vi.collections[e.collection].label}</span>
+                <span class="what">
+                  <a href={entryHref(e)}>{e.data.title}</a>
+                  {e.data.draft && <span class="pill draft">{vi.ui.draft}</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  function init() {
+    const bar = document.querySelector<HTMLElement>('[data-archive-filters]');
+    if (!bar) return;
+    bar.hidden = false;
+    const chips = [...bar.querySelectorAll<HTMLButtonElement>('button[data-type]')];
+    const select = bar.querySelector<HTMLSelectElement>('select[data-month]')!;
+    const countOut = bar.querySelector<HTMLElement>('[data-archive-count]')!;
+    const none = document.querySelector<HTMLElement>('[data-archive-none]')!;
+    const groups = [...document.querySelectorAll<HTMLElement>('[data-month-group]')];
+    const tpl = bar.dataset.countTpl ?? '{n}';
+    const count = (n: number) => tpl.replace('{n}', String(n));
+    let type = '';
+
+    const apply = () => {
+      let total = 0;
+      for (const g of groups) {
+        const monthOk = !select.value || g.dataset.monthGroup === select.value;
+        let shown = 0;
+        g.querySelectorAll<HTMLElement>('li[data-type]').forEach((li) => {
+          const ok = monthOk && (!type || li.dataset.type === type);
+          li.hidden = !ok;
+          if (ok) shown++;
+        });
+        g.hidden = shown === 0;
+        const c = g.querySelector<HTMLElement>('[data-month-count]');
+        if (c) c.textContent = count(shown);
+        total += shown;
+      }
+      countOut.textContent = count(total);
+      none.hidden = total > 0;
+    };
+
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        type = chip.dataset.type ?? '';
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        apply();
+      }),
+    );
+    select.addEventListener('change', apply);
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .index-head { padding: 44px 0 26px; border-bottom: 1px solid var(--line-strong); }
+  .index-head .eyebrow { margin-bottom: 16px; }
+  .index-head .standfirst { margin-top: 16px; }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .f-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .f-label {
+    font: 500 10.5px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3-text);
+    margin-right: 6px;
+  }
+  .chip {
+    padding: 5px 12px 4px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: transparent;
+    font: 500 12px/1.4 var(--font-sans);
+    color: var(--ink-2);
+    transition: background-color var(--dur-micro) var(--ease-std), color var(--dur-micro) var(--ease-std),
+      border-color var(--dur-micro) var(--ease-std);
+  }
+  .chip:hover { border-color: var(--line-strong); color: var(--ink); }
+  .chip[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  select {
+    padding: 5px 30px 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font: 400 13px/1.4 var(--font-sans);
+  }
+  .f-count {
+    margin-left: auto;
+    font: 400 11.5px/1.4 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+
+  .items { list-style: none; }
+  .items li {
+    display: grid;
+    grid-template-columns: 96px 128px minmax(0, 1fr);
+    gap: 4px 16px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .items time {
+    font: 400 12px/1.5 var(--font-mono);
+    color: var(--ink-3-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .type {
+    font: 500 10.5px/1.5 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .what { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .what a { font-weight: 500; line-height: 1.45; }
+  .empty {
+    padding: 28px 0;
+    font: 400 12px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+  @media (max-width: 640px) {
+    .items li { grid-template-columns: auto 1fr; }
+    .what { grid-column: 1 / -1; }
+    .f-count { margin-left: 0; flex-basis: 100%; }
+  }
+</style>
