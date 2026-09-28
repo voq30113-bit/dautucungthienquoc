@@ -1,0 +1,38 @@
+---
+import { vi } from '../i18n/vi';
+---
+
+<button
+  type="button"
+  class="theme-toggle"
+  data-theme-toggle
+  data-to-light={vi.ui.themeToLight}
+  data-to-dark={vi.ui.themeToDark}
+  aria-label={vi.ui.themeToDark}
+  title={vi.ui.theme}
+>
+  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
+    <circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+    <path class="half half-r" d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"></path>
+    <path class="half half-l" d="M10 2.75a7.25 7.25 0 0 0 0 14.5z" fill="currentColor"></path>
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--ink);
+    transition: border-color var(--dur-micro) var(--ease-std), background-color var(--dur-micro) var(--ease-std);
+  }
+  .theme-toggle:hover { border-color: var(--line-strong); background: var(--surface); }
+  .half { transition: opacity var(--dur-micro) var(--ease-std); }
+  .half-l { opacity: 0; }
+  .theme-toggle[data-current='dark'] .half-r { opacity: 0; }
+  .theme-toggle[data-current='dark'] .half-l { opacity: 1; }
+</style>

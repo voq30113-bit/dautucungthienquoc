@@ -1,0 +1,78 @@
+---
+import Brand from './Brand.astro';
+import { vi } from '../i18n/vi';
+import { href } from '../lib/content';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <Brand size="sm" />
+        <p class="foot-tag">{vi.site.tagline}.</p>
+        <p class="foot-schedule">{vi.footer.schedule}</p>
+      </div>
+      <nav class="foot-nav" aria-label={vi.ui.sitemap}>
+        <ul>
+          {
+            vi.nav.items.map((item) => (
+              <li>
+                <a href={href(item.href)}>{item.label}</a>
+              </li>
+            ))
+          }
+          <li><a href={href('tim-kiem/')}>{vi.ui.search}</a></li>
+          <li><a href={href('rss.xml')}>{vi.ui.rss}</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="foot-legal">
+      <p class="foot-disclaimer"><strong>{vi.disclaimer.title}.</strong> {vi.disclaimer.text}</p>
+      <p class="foot-copy">{vi.footer.rights(year)}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: 72px;
+    border-top: 2px solid var(--ink);
+    padding: 28px 0 calc(32px + env(safe-area-inset-bottom));
+    font-size: 14px;
+  }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 28px 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .foot-tag { margin-top: 14px; color: var(--ink-2); max-width: 44ch; }
+  .foot-schedule {
+    margin-top: 10px;
+    font: 400 11.5px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+  .foot-nav ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 24px;
+  }
+  .foot-nav a { color: var(--ink-2); }
+  .foot-nav a:hover { color: var(--ink); }
+  .foot-legal { padding-top: 18px; display: grid; gap: 10px; }
+  .foot-disclaimer { font-size: 12.5px; line-height: 1.6; color: var(--ink-2); max-width: 88ch; }
+  .foot-disclaimer strong { color: var(--ink); font-weight: 600; }
+  .foot-copy {
+    font: 400 11.5px/1.6 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+  }
+  @media (max-width: 640px) {
+    .foot-grid { grid-template-columns: 1fr; }
+  }
+</style>

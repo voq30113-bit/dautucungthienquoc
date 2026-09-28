@@ -1,0 +1,78 @@
+---
+/*
+ * Brand wordmark — the only place the brand is drawn. Import it everywhere.
+ *
+ * LOGO SWAP POINT
+ * ---------------
+ * To use an SVG logo, change only this file:
+ *   1. Save the logo as src/assets/logo.svg
+ *   2. Replace the <slot name="mark"> fallback below with:
+ *        <Logo class="brand-logo" aria-hidden="true" />
+ *      after adding `import Logo from '../assets/logo.svg';` to the frontmatter.
+ *   3. Keep the `.sr-only` name span so the link keeps its accessible name.
+ * A one-off override is also possible from any template:
+ *   <Brand><svg slot="mark">…</svg></Brand>
+ */
+import { vi } from '../i18n/vi';
+import { href as link } from '../lib/content';
+
+interface Props {
+  /** Link target; pass `null` for a static (non-link) wordmark. */
+  href?: string | null;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+const { href = link(''), size = 'md', class: cls } = Astro.props;
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag
+  class:list={['brand', 'plain', `brand-${size}`, cls]}
+  href={href ?? undefined}
+  aria-label={href ? `${vi.site.name} — ${vi.site.homeLabel}` : undefined}
+>
+  <slot name="mark">
+    <span class="brand-kicker" aria-hidden={href ? 'true' : undefined}>{vi.site.brandKicker}</span>
+    <span class="brand-name" aria-hidden={href ? 'true' : undefined}>{vi.site.brandName}</span>
+  </slot>
+  {!href && <span class="sr-only">{vi.site.name}</span>}
+</Tag>
+
+<style>
+  .brand {
+    --kicker-size: 10.5px;
+    --name-size: 1.72rem;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--ink);
+    line-height: 1;
+    background-image: none;
+  }
+  .brand-sm { --kicker-size: 9px; --name-size: 1.25rem; }
+  .brand-lg { --kicker-size: 12px; --name-size: 2.3rem; }
+
+  .brand-kicker {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: var(--kicker-size);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-variant-caps: all-small-caps;
+    color: var(--accent);
+    margin-bottom: 0.32em;
+    transition: font-size var(--dur-page) var(--ease-out), margin var(--dur-page) var(--ease-out);
+  }
+  .brand-name {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: var(--name-size);
+    letter-spacing: -0.012em;
+    line-height: 0.95;
+    transition: font-size var(--dur-page) var(--ease-out);
+  }
+  /* all-small-caps shrinks the caps; compensate so the kicker reads at size. */
+  @supports (font-variant-caps: all-small-caps) {
+    .brand-kicker { font-size: calc(var(--kicker-size) * 1.28); }
+  }
+</style>

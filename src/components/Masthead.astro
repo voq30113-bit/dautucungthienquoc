@@ -1,0 +1,232 @@
+---
+import Brand from './Brand.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { vi } from '../i18n/vi';
+import { href } from '../lib/content';
+import { formatLongDate, isoDay } from '../lib/format';
+
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const home = href('');
+const now = new Date();
+
+const items = vi.nav.items.map((item) => {
+  const target = href(item.href);
+  const active = item.href === '' ? path === home : path.startsWith(target);
+  return { ...item, target, active, exact: path === target };
+});
+---
+
+<header class="masthead" data-masthead transition:name="masthead" transition:animate="none">
+  <div class="mast-top">
+    <div class="wrap mast-top-in">
+      <time class="mast-date" datetime={isoDay(now)} data-today>{formatLongDate(now)}</time>
+      <span class="mast-tag">{vi.site.tagline}</span>
+    </div>
+  </div>
+  <div class="wrap mast-brand-row">
+    <Brand />
+    <div class="mast-tools">
+      <a class="search-link plain" href={href('tim-kiem/')}>
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+          <circle cx="8.5" cy="8.5" r="5.75" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+          <path d="M13 13l4.25 4.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+        <span class="search-label">{vi.ui.search}</span>
+      </a>
+      <ThemeToggle />
+    </div>
+  </div>
+  <nav class="mast-nav" aria-label={vi.nav.label}>
+    <div class="wrap">
+      <ul data-nav-list>
+        {
+          items.map((item) => (
+            <li>
+              <a
+                href={item.target}
+                class:list={['plain', { active: item.active }]}
+                aria-current={item.exact ? 'page' : item.active ? 'true' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<script>
+  import { formatLongDate, isoDay } from '../lib/format';
+
+  const CONDENSE_AT = 120;
+  const EXPAND_AT = 56;
+  let cleanup: (() => void) | null = null;
+
+  function init() {
+    cleanup?.();
+    const mast = document.querySelector<HTMLElement>('[data-masthead]');
+    if (!mast) return;
+
+    // Build-time date is the no-JS fallback; show today's date in Vietnam time.
+    const today = mast.querySelector<HTMLTimeElement>('[data-today]');
+    if (today) {
+      const now = new Date();
+      today.textContent = formatLongDate(now);
+      today.dateTime = isoDay(now);
+    }
+
+    // Keep the active nav item in view on narrow screens.
+    const list = mast.querySelector<HTMLElement>('[data-nav-list]');
+    const active = list?.querySelector<HTMLElement>('a.active');
+    if (list && active && list.scrollWidth > list.clientWidth) {
+      list.scrollLeft = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
+    }
+
+    let condensed = false;
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const y = window.scrollY;
+      if (!condensed && y > CONDENSE_AT) condensed = true;
+      else if (condensed && y < EXPAND_AT) condensed = false;
+      else return;
+      document.documentElement.classList.toggle('mast-condensed', condensed);
+    };
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    update();
+    cleanup = () => {
+      window.removeEventListener('scroll', onScroll);
+      document.documentElement.classList.remove('mast-condensed');
+    };
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    padding-top: env(safe-area-inset-top);
+    transition: box-shadow var(--dur-page) var(--ease-out);
+  }
+  .mast-top {
+    height: var(--mast-top);
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    transition: height var(--dur-page) var(--ease-out), opacity var(--dur-page) var(--ease-out),
+      border-bottom-width var(--dur-page) var(--ease-out);
+  }
+  .mast-top-in {
+    height: var(--mast-top);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font: 400 11.5px/1 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-3-text);
+    white-space: nowrap;
+  }
+  .mast-tag { overflow: hidden; text-overflow: ellipsis; }
+
+  .mast-brand-row {
+    height: var(--mast-brand);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: height var(--dur-page) var(--ease-out);
+  }
+  .mast-tools { display: flex; align-items: center; gap: 10px; }
+  .search-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font: 500 11.5px/1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    transition: border-color var(--dur-micro) var(--ease-std), color var(--dur-micro) var(--ease-std),
+      background-color var(--dur-micro) var(--ease-std);
+  }
+  .search-link:hover { border-color: var(--line-strong); color: var(--ink); background: var(--surface); }
+
+  .mast-nav { border-top: 1px solid var(--line); }
+  .mast-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2px;
+    height: var(--mast-nav);
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: -10px;
+  }
+  .mast-nav ul::-webkit-scrollbar { display: none; }
+  .mast-nav li { flex: none; }
+  .mast-nav a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 10px;
+    font: 500 13.5px/1 var(--font-sans);
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition: color var(--dur-micro) var(--ease-std);
+  }
+  .mast-nav a::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-micro) var(--ease-std);
+  }
+  .mast-nav a:hover { color: var(--ink); }
+  .mast-nav a:hover::after { transform: scaleX(0.35); }
+  .mast-nav a.active { color: var(--ink); }
+  .mast-nav a.active::after { transform: scaleX(1); }
+  .mast-nav a:focus-visible { outline-offset: -2px; }
+
+  /* Condensed state: rows shrink, wordmark scales down, hairline shadow appears. */
+  :global(html.mast-condensed) .masthead { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+  :global(html.mast-condensed) .mast-top { height: 0; opacity: 0; border-bottom-width: 0; }
+  :global(html.mast-condensed) .mast-brand-row { height: var(--mast-brand-c); }
+  :global(html.mast-condensed) .mast-brand-row :global(.brand) { --kicker-size: 8.5px; --name-size: 1.3rem; }
+
+  /* Compensate the height the masthead gives up so content never jumps. */
+  :global(main) { transition: padding-top var(--dur-page) var(--ease-out); }
+  :global(html.mast-condensed main) {
+    padding-top: calc(var(--mast-top) + var(--mast-brand) - var(--mast-brand-c));
+  }
+
+  @media (max-width: 640px) {
+    .mast-tag { display: none; }
+    .search-link { padding: 0; width: 36px; justify-content: center; }
+    .search-label {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .mast-brand-row :global(.brand) { --kicker-size: 9.5px; --name-size: 1.45rem; }
+  }
+</style>
