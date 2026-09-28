@@ -1,0 +1,342 @@
+/* ==========================================================================
+   Base typography, shared utilities, long-form prose, motion states, print.
+   Component-specific rules live in each component's <style> block.
+   ========================================================================== */
+
+html {
+  background: var(--paper);
+  scroll-padding-top: calc(var(--mast-condensed) + 12px);
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main { flex: 1 0 auto; }
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 6.5vw, 3.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.6vw, 2.05rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+h3 { font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em; line-height: 1.4; }
+h4 { font-family: var(--font-serif); font-weight: 600; font-size: 1.28rem; letter-spacing: -0.005em; line-height: 1.25; }
+strong, b { font-weight: 600; }
+p { text-wrap: pretty; }
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+/* Links: underline sweeps in from the left. Never text-decoration toggling. */
+a {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size var(--dur-micro) var(--ease-std), color var(--dur-micro) var(--ease-std);
+}
+a:hover { background-size: 100% 1px; }
+a.plain, a.plain:hover { background-image: none; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 1px;
+}
+
+/* ---------- Layout ---------- */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--col) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+}
+.section { padding-top: 46px; }
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  z-index: 100;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 500 13px/1.2 var(--font-sans);
+  transform: translateY(-160%);
+  transition: transform var(--dur-micro) var(--ease-std);
+}
+.skip:focus { transform: none; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Type roles ---------- */
+.eyebrow {
+  font: 500 11.5px/1.4 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.byline {
+  font: 400 11.5px/1.6 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--ink-3-text);
+}
+.standfirst {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 2.4vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+.caption {
+  font: 400 10.5px/1.5 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3-text);
+}
+.mono { font-family: var(--font-mono); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.up { color: var(--up-text); }
+.down { color: var(--down-text); }
+.flat { color: var(--ink-3-text); }
+
+/* Section head: Roman numeral + h2 over a strong hairline. */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 22px;
+}
+.sec-head .numeral {
+  font: 600 12px/1 var(--font-mono);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  flex: none;
+  min-width: 2.2em;
+}
+.sec-head h2 { flex: 1; }
+.sec-head .aside {
+  font: 400 11.5px/1.4 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--ink-3-text);
+  white-space: nowrap;
+}
+
+/* Pills and chips */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 2px;
+  border-radius: 100px;
+  font: 500 10.5px/1.5 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.pill.accent { background: var(--accent); color: var(--on-accent); }
+.pill.soft { background: var(--accent-soft); color: var(--accent); }
+.pill.pos { background: var(--up-soft); color: var(--up-text); }
+.pill.neg { background: var(--down-soft); color: var(--down-text); }
+.pill.warn { background: var(--warn-soft); color: var(--warn-text); }
+.pill.draft { background: var(--warn-soft); color: var(--warn-text); }
+
+/* ---------- Long-form prose ---------- */
+.prose {
+  counter-reset: sec;
+  font-size: 1.0625rem;
+}
+.prose > * + * { margin-top: 1.05em; }
+.prose p, .prose ul, .prose ol, .prose blockquote, .prose > h3 { max-width: 68ch; }
+.prose h2 {
+  counter-increment: sec;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-top: 46px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 22px;
+  margin-top: 0;
+  scroll-margin-top: calc(var(--mast-condensed) - 30px);
+}
+.prose h2::before {
+  content: counter(sec, upper-roman);
+  font: 600 12px/1 var(--font-mono);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  flex: none;
+  min-width: 2.2em;
+}
+.prose h2 + * { margin-top: 0; }
+.prose h3 { margin-top: 1.9em; }
+.prose h3 + * { margin-top: 0.45em; }
+.prose h4 { margin-top: 1.6em; }
+.prose a {
+  color: var(--accent);
+  background-image: linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--line-strong), var(--line-strong));
+  background-size: 0% 1px, 100% 1px;
+  background-position: 0 100%, 0 100%;
+}
+.prose a:hover { background-size: 100% 1px, 100% 1px; }
+.prose ul, .prose ol { padding-left: 1.35em; }
+.prose li + li { margin-top: 0.35em; }
+.prose ul > li { list-style: none; position: relative; }
+.prose ul > li::before {
+  content: '–';
+  position: absolute;
+  left: -1.2em;
+  color: var(--ink-3);
+}
+.prose ol > li::marker { font: 500 0.8em var(--font-mono); color: var(--accent); }
+.prose hr { border: 0; border-top: 1px solid var(--line); margin-block: 2em; }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--surface-2);
+  padding: 0.08em 0.35em;
+  border-radius: 3px;
+}
+/* Markdown blockquotes read as accent callouts, so plain-Markdown bulletins get one. */
+.prose blockquote {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 18px;
+}
+.prose blockquote > * + * { margin-top: 0.6em; }
+
+/* Markdown tables: scroll inside their own box, never the page. */
+.prose table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.prose th {
+  font: 500 10.5px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3-text);
+  text-align: left;
+  padding: 10px 12px 9px;
+  border-bottom: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+.prose td { padding: 9px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+.prose tr:first-child td { border-top: 0; }
+.prose td[align='right'], .prose th[align='right'],
+.prose td[style*='right'], .prose th[style*='right'] { text-align: right; }
+.prose td[align='right'], .prose td[style*='right'] {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.prose .sample-note {
+  font: 400 12px/1.6 var(--font-mono);
+  letter-spacing: 0.02em;
+  color: var(--warn-text);
+  background: var(--warn-soft);
+  border-left: 3px solid var(--warn);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 16px;
+  max-width: none;
+}
+
+/* ---------- Scroll reveal (JS-applied classes only; visible by default) ---------- */
+.rv {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-enter) var(--ease-out) var(--rv-delay, 0ms),
+    transform var(--dur-enter) var(--ease-out) var(--rv-delay, 0ms);
+}
+
+/* ---------- View transitions ---------- */
+::view-transition-group(*) {
+  animation-duration: var(--dur-page);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-timing-function: var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ---------- Print (A4) ---------- */
+@page { size: A4; margin: 16mm 14mm 18mm; }
+@media print {
+  :root {
+    --paper: #fff; --surface: #fff; --surface-2: #f2f2f2;
+    --ink: #000; --ink-2: #333; --ink-3: #555; --ink-3-text: #555;
+    --line: #ccc; --line-strong: #999;
+    --accent: #1B4D3E; --accent-soft: #eef3f0;
+    color-scheme: light;
+  }
+  html, body { background: #fff; font-size: 10.5pt; }
+  .no-print, .masthead, .skip, .toc, .progress, .pager, .theme-toggle, .search-link { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .rv { opacity: 1 !important; transform: none !important; }
+  a { background: none !important; color: inherit; }
+  .prose a[href^='http']::after, .sources a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font: 400 8pt var(--font-mono);
+    color: #555;
+    word-break: break-all;
+  }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+  table, figure, .keep, .ticker, .bars, .ladder, .matrix, .scenarios, .calendar, .callout, blockquote { break-inside: avoid; page-break-inside: avoid; }
+  .prose h2 { padding-top: 18pt; }
+  .prose table { display: table; width: 100%; overflow: visible; }
+}
