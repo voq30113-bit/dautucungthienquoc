@@ -23,7 +23,6 @@ export const GET: APIRoute = async ({ site }) => {
   }
   add('', newest);
   add('luu-tru/', newest);
-  add('gioi-thieu/');
 
   const body = urls
     .map((u) => `  <url><loc>${esc(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`)

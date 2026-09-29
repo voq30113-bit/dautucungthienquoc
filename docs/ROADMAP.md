@@ -32,7 +32,6 @@ Không có đăng nhập, cơ sở dữ liệu hay backend. Trang vẫn là web 
 
 - **Logo:** hiện dùng wordmark bằng chữ. Khi có logo SVG, chỉ cần sửa `src/components/Brand.astro` (xem hướng dẫn trong README).
 - **Tên miền riêng:** xem `docs/DOMAIN.md`.
-- **Phần giới thiệu tác giả:** trang `/gioi-thieu/` mới mô tả trang và nguyên tắc biên tập. Nếu muốn, chủ trang có thể bổ sung phần giới thiệu bản thân.
 - **Ảnh chia sẻ mạng xã hội (Open Graph image):** chưa có. Có thể thêm một ảnh mặc định, hoặc tạo ảnh tự động cho từng bài.
 - **Bài mẫu:** ba bài mẫu (và một bản nháp) chỉ dùng để kiểm tra giao diện. Xoá khi đã có bài thật.
 - **Token đăng bài tự động:** nhớ xoay vòng token trước ngày hết hạn (xem `docs/AUTOMATION.md`).
