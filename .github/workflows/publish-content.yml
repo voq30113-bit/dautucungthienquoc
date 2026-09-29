@@ -1,0 +1,72 @@
+# Accept posts from the scheduled Claude routines.
+#
+# A routine commits one post to a branch named content/<collection>-<YYYY-MM-DD>...
+# and pushes it (through Claude's GitHub connection — no personal token).
+# This workflow then:
+#   1. refuses the branch unless it ONLY adds/changes files in src/content/<collection>/,
+#   2. runs the same checks as a normal build (content lint, astro check, full build),
+#   3. merges it into main, deletes the branch, and starts the Deploy workflow.
+# If any step fails, main and the live site are untouched and the branch is left
+# for inspection (Actions tab → "Publish content" → the failed run).
+name: Publish content
+
+on:
+  push:
+    branches: ['content/**']
+
+permissions:
+  contents: write # merge into main, delete the branch
+  actions: write # start the Deploy workflow on main
+
+# One merge at a time, in arrival order.
+concurrency:
+  group: publish-content
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Only content files may change
+        run: |
+          git fetch origin main
+          changed=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"; echo "$changed"
+          if [ -z "$changed" ]; then echo "::error::Branch has no changes."; exit 1; fi
+          bad=$(echo "$changed" | grep -vE '^src/content/(diem-tin|nhan-dinh|tong-ket|bao-cao|phan-tich)/[0-9]{4}-[0-9]{2}-[0-9]{2}(-[a-z0-9]+(-[a-z0-9]+)*)?\.mdx?$' || true)
+          if [ -n "$bad" ]; then echo "::error::Only post files under src/content/<collection>/ are accepted. Rejected: $bad"; exit 1; fi
+
+      - name: Setup Node (version from .nvmrc)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Check (types + content lint)
+        run: npm run check
+
+      - name: Build (schema validation)
+        run: npm run build
+
+      - name: Merge into main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          branch="${GITHUB_REF#refs/heads/}"
+          git checkout -B main origin/main
+          git merge --no-ff --no-edit -m "content: publish ${branch#content/}" "origin/$branch" || git merge --no-ff --no-edit -m "content: publish ${branch#content/}" "$GITHUB_SHA"
+          git push origin main
+          git push origin --delete "$branch"
+
+      - name: Deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
