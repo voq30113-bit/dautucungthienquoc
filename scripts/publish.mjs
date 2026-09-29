@@ -6,7 +6,7 @@
  *   GITHUB_TOKEN=… npm run publish -- --collection nhan-dinh --file ./2026-09-29.md
  *
  * Options
- *   --collection  nhan-dinh | tong-ket | bao-cao | phan-tich      (required)
+ *   --collection  diem-tin | nhan-dinh | tong-ket | bao-cao | phan-tich   (required)
  *   --file        path to the local .md / .mdx file               (required)
  *   --message     commit message (default: "content(<collection>): <file>")
  *   --repo        owner/name (default: $GITHUB_REPOSITORY, else the `origin` remote)
@@ -21,7 +21,7 @@ import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 
-const COLLECTIONS = ['nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'];
+const COLLECTIONS = ['diem-tin', 'nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'];
 const NAME = /^\d{4}-\d{2}-\d{2}(-[a-z0-9]+(?:-[a-z0-9]+)*)?\.mdx?$/;
 const API = 'https://api.github.com';
 

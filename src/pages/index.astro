@@ -19,7 +19,8 @@ import { formatDate } from '../lib/format';
 import { marketTicker } from '../lib/market';
 
 const all = await getAllEntries();
-const [nhanDinh, tongKet, baoCao] = await Promise.all([
+const [diemTin, nhanDinh, tongKet, baoCao] = await Promise.all([
+  getEntries('diem-tin'),
   getEntries('nhan-dinh'),
   getEntries('tong-ket'),
   getEntries('bao-cao'),
@@ -35,7 +36,7 @@ let lead: Entry | undefined = longform[0] ?? all[0];
 if (featured && (!lead || featured.data.date > lead.data.date)) lead = featured;
 
 // Daily split and weekly block skip whatever is already the lead.
-const daily = [nhanDinh.find((e) => !sameEntry(e, lead)), tongKet.find((e) => !sameEntry(e, lead))].filter(
+const daily = [diemTin, nhanDinh, tongKet].map((list) => list.find((e) => !sameEntry(e, lead))).filter(
   (e): e is Entry => !!e,
 );
 const weekly = baoCao.find((e) => !sameEntry(e, lead));
@@ -109,7 +110,7 @@ const jsonLd = [
     daily.length > 0 && (
       <section class="wrap section" aria-labelledby="ban-tin">
         <SecHead n={next()} title={vi.home.daily} id="ban-tin" />
-        <div class="split" data-reveal-stagger>
+        <div class="split" style={`--cols:${daily.length}`} data-reveal-stagger>
           {daily.map((e) => (
             <article class="card">
               <p class="eyebrow">
@@ -201,23 +202,24 @@ const jsonLd = [
 
   .split {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
     gap: 1px;
     background: var(--line);
     border-block: 1px solid var(--line);
   }
   .card {
     background: var(--paper);
-    padding: 20px 28px 22px 0;
+    padding: 20px 24px 22px;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
-  .card + .card { padding: 20px 0 22px 28px; }
+  .card:first-child { padding-left: 0; }
+  .card:last-child { padding-right: 0; }
   .card-title {
     font-family: var(--font-serif);
     font-weight: 500;
-    font-size: clamp(1.35rem, 2.8vw, 1.62rem);
+    font-size: clamp(1.3rem, 2.4vw, 1.5rem);
     line-height: 1.15;
     letter-spacing: -0.01em;
     text-wrap: balance;
@@ -275,7 +277,7 @@ const jsonLd = [
 
   @media (max-width: 640px) {
     .split { grid-template-columns: 1fr; }
-    .card, .card + .card { padding: 18px 0 20px; }
+    .card, .card:first-child, .card:last-child { padding: 18px 0 20px; }
     .feature { grid-template-columns: 1fr; }
     .recent li { grid-template-columns: auto 1fr; }
     .recent a { grid-column: 1 / -1; }

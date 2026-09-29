@@ -6,7 +6,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { vi, type CollectionKey } from '../i18n/vi';
 
-export const COLLECTIONS = ['nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'] as const satisfies readonly CollectionKey[];
+export const COLLECTIONS = ['diem-tin', 'nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'] as const satisfies readonly CollectionKey[];
 export type Key = (typeof COLLECTIONS)[number];
 export type Entry = CollectionEntry<Key>;
 

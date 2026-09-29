@@ -16,7 +16,7 @@ import yaml from 'js-yaml';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const CONTENT = join(ROOT, 'src', 'content');
-const COLLECTIONS = ['nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'];
+const COLLECTIONS = ['diem-tin', 'nhan-dinh', 'tong-ket', 'bao-cao', 'phan-tich'];
 const NAME = /^\d{4}-\d{2}-\d{2}(-[a-z0-9]+(?:-[a-z0-9]+)*)?\.mdx?$/;
 
 const errors = [];

@@ -23,16 +23,23 @@ export const vi = {
     label: 'Điều hướng chính',
     items: [
       { href: '', label: 'Trang chủ' },
+      { href: 'diem-tin/', label: 'Điểm tin' },
       { href: 'nhan-dinh/', label: 'Nhận định' },
       { href: 'tong-ket/', label: 'Tổng kết phiên' },
       { href: 'bao-cao/', label: 'Báo cáo' },
       { href: 'phan-tich/', label: 'Phân tích' },
       { href: 'luu-tru/', label: 'Lưu trữ' },
-      { href: 'gioi-thieu/', label: 'Giới thiệu' },
     ],
   },
 
   collections: {
+    'diem-tin': {
+      label: 'Điểm tin',
+      singular: 'Điểm tin buổi sáng',
+      title: 'Điểm tin tài chính buổi sáng',
+      description:
+        'Bài điểm tin phát hành lúc 7:00 các ngày giao dịch: thị trường thế giới qua đêm, vĩ mô, doanh nghiệp và những câu chuyện đáng chú ý trước giờ mở cửa.',
+    },
     'nhan-dinh': {
       label: 'Nhận định',
       singular: 'Nhận định trước phiên',
@@ -170,11 +177,6 @@ export const vi = {
     results: (n: number) => `${n} kết quả`,
     unavailable: 'Chỉ mục tìm kiếm được tạo khi build. Hãy chạy npm run build rồi npm run preview để thử tìm kiếm.',
     noscript: 'Tìm kiếm cần JavaScript. Bạn có thể duyệt toàn bộ bài viết trong mục Lưu trữ.',
-  },
-
-  about: {
-    title: 'Giới thiệu',
-    description: 'Đầu tư cùng Thiên Quốc là gì, xuất bản những gì và theo nguyên tắc nào.',
   },
 
   notFound: {

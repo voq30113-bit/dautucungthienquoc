@@ -56,6 +56,7 @@ const collection = (dir: string) =>
   });
 
 export const collections = {
+  'diem-tin': collection('diem-tin'),
   'nhan-dinh': collection('nhan-dinh'),
   'tong-ket': collection('tong-ket'),
   'bao-cao': collection('bao-cao'),
