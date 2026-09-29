@@ -1,16 +1,17 @@
 ---
 /*
- * Brand wordmark — the only place the brand is drawn. Import it everywhere.
+ * Brand: logo mark + wordmark. The only place the brand is drawn — import it everywhere.
+ *
+ * The mark is a redrawn version of the owner's Canva logo (T whose stem runs
+ * into a Q ring, the Q's tail rising as an arrow). It is inline SVG so it
+ * follows the theme: the T uses --ink, ring and arrow use --accent.
+ * The same geometry is used for public/favicon.svg — keep the two in sync.
  *
  * LOGO SWAP POINT
  * ---------------
- * To use an SVG logo, change only this file:
- *   1. Save the logo as src/assets/logo.svg
- *   2. Replace the <slot name="mark"> fallback below with:
- *        <Logo class="brand-logo" aria-hidden="true" /><span class="sr-only">{vi.site.name}</span>
- *      after adding `import Logo from '../assets/logo.svg';` to the frontmatter.
- *   3. Give the logo an accessible name, e.g. <span class="sr-only">{vi.site.name}</span>
- *      next to it (the visible wordmark text is the name today).
+ * To use a different logo, change only this file: replace the contents of
+ * <slot name="mark"> below. Keep a text alternative (the wordmark spans, or
+ * <span class="sr-only">{vi.site.name}</span>) so the link keeps its name.
  * A one-off override is also possible from any template:
  *   <Brand><svg slot="mark">…</svg></Brand>
  */
@@ -29,8 +30,18 @@ const Tag = href ? 'a' : 'span';
 
 <Tag class:list={['brand', 'plain', `brand-${size}`, cls]} href={href ?? undefined}>
   <slot name="mark">
-    <span class="brand-kicker">{vi.site.brandKicker}</span>
-    <span class="brand-name">{vi.site.brandName}</span>
+    <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <g fill="none" stroke-width="4.4">
+        <path class="t" d="M5 8.5H24M13 8.5V26" />
+        <path class="q" d="M36.28 21.9A12 12 0 1 1 29.1 14.72" />
+        <path class="q" d="M22 29L37.4 13.6" />
+      </g>
+      <path class="head" d="M43 8L40.88 17.2L33.8 10.12Z" />
+    </svg>
+    <span class="brand-words">
+      <span class="brand-kicker">{vi.site.brandKicker}</span>
+      <span class="brand-name">{vi.site.brandName}</span>
+    </span>
   </slot>
   {href && <span class="sr-only"> — {vi.site.homeLabel}</span>}
 </Tag>
@@ -40,8 +51,8 @@ const Tag = href ? 'a' : 'span';
     --kicker-size: 10.5px;
     --name-size: 1.72rem;
     display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    gap: calc(var(--name-size) * 0.36);
     color: var(--ink);
     line-height: 1;
     background-image: none;
@@ -49,6 +60,17 @@ const Tag = href ? 'a' : 'span';
   .brand-sm { --kicker-size: 9px; --name-size: 1.25rem; }
   .brand-lg { --kicker-size: 12px; --name-size: 2.3rem; }
 
+  .brand-mark {
+    flex: none;
+    width: calc(var(--name-size) * 1.42);
+    height: calc(var(--name-size) * 1.42);
+    transition: width var(--dur-page) var(--ease-out), height var(--dur-page) var(--ease-out);
+  }
+  .brand-mark .t { stroke: currentColor; }
+  .brand-mark .q { stroke: var(--accent); }
+  .brand-mark .head { fill: var(--accent); }
+
+  .brand-words { display: inline-flex; flex-direction: column; justify-content: center; }
   .brand-kicker {
     font-family: var(--font-mono);
     font-weight: 500;
