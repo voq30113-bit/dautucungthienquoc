@@ -7,9 +7,11 @@
  *   total={['Tổng', '2.101', '2.613']}
  * />
  * Cells may be strings or numbers; numbers are formatted Vietnamese-style.
+ * Without an explicit column `decimals`, a column shows as many decimals as
+ * its most precise value, so figures are never silently rounded.
  * Prefix a cell with '+' or '−' and set `signed: true` on its column to colour it.
  */
-import { formatNumber } from '../lib/format';
+import { formatNumber, precision } from '../lib/format';
 
 interface Column {
   label: string;
@@ -27,8 +29,12 @@ interface Props {
 }
 const { caption, columns, rows, total, note } = Astro.props;
 
+const allRows = total ? [...rows, total] : rows;
+const decimalsFor = columns.map(
+  (col, i) => col.decimals ?? precision(...allRows.map((r) => r[i]).filter((c): c is number => typeof c === 'number')),
+);
 const text = (cell: Cell, col: Column) =>
-  typeof cell === 'number' ? formatNumber(cell, col.decimals ?? 0, col.signed) : cell;
+  typeof cell === 'number' ? formatNumber(cell, decimalsFor[columns.indexOf(col)] ?? 0, col.signed) : cell;
 const tone = (cell: Cell, col: Column) => {
   if (!col.signed) return undefined;
   const s = String(typeof cell === 'number' ? text(cell, col) : cell).trim();

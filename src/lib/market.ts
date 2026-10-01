@@ -4,7 +4,7 @@
  */
 import type { TickerItem } from '../components/TickerStrip.astro';
 import { vi } from '../i18n/vi';
-import { direction, formatNumber } from './format';
+import { direction, formatNumber, precision } from './format';
 
 export interface MarketSnapshot {
   vnindex: number;
@@ -40,10 +40,10 @@ export function marketTicker(m: MarketSnapshot): TickerItem[] {
       value: m.volume / 1e6,
       decimals: 1,
       unit: t.millionShares,
-      delta: m.valueBn !== undefined ? `${formatNumber(m.valueBn)} ${t.bn}` : undefined,
+      delta: m.valueBn !== undefined ? `${formatNumber(m.valueBn, Math.min(precision(m.valueBn), 1))} ${t.bn}` : undefined,
     });
   } else if (m.valueBn !== undefined) {
-    items.push({ key: t.value, value: m.valueBn, unit: t.bn });
+    items.push({ key: t.value, value: m.valueBn, decimals: Math.min(precision(m.valueBn), 1), unit: t.bn });
   }
 
   if (m.foreignNetBn !== undefined) {
@@ -51,6 +51,7 @@ export function marketTicker(m: MarketSnapshot): TickerItem[] {
     items.push({
       key: t.foreign,
       value: m.foreignNetBn,
+      decimals: Math.min(precision(m.foreignNetBn), 2),
       signed: true,
       tone: fdir,
       unit: 'tỷ',

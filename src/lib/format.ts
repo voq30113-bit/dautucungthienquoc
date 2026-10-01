@@ -29,6 +29,20 @@ export function formatNumber(value: number, decimals = 0, signed = false): strin
   return abs;
 }
 
+/**
+ * Decimal places needed to show every value without rounding (max 4).
+ * Used when authors pass raw numbers without an explicit `decimals`.
+ */
+export function precision(...values: number[]): number {
+  let max = 0;
+  for (const v of values) {
+    if (!Number.isFinite(v)) continue;
+    const frac = String(v).split('.')[1];
+    if (frac) max = Math.max(max, Math.min(frac.length, 4));
+  }
+  return max;
+}
+
 export type Direction = 'up' | 'down' | 'flat';
 
 export function direction(value: number | undefined): Direction {

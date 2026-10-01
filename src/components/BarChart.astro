@@ -5,7 +5,7 @@
  * <BarChart caption="Tỷ trọng giá trị giao dịch theo ngành (%)" unit="%"
  *   items={[{ label: 'Ngân hàng', value: 24.6, tone: 'accent' }]} note="Nguồn: HOSE" />
  */
-import { formatNumber } from '../lib/format';
+import { formatNumber, precision } from '../lib/format';
 
 interface Item {
   label: string;
@@ -19,10 +19,12 @@ interface Props {
   items: Item[];
   max?: number;
   unit?: string;
+  /** Defaults to the precision of the data (integers stay integers). */
   decimals?: number;
   note?: string;
 }
-const { caption, items, unit = '', decimals = 1, note } = Astro.props;
+const { caption, items, unit = '', note } = Astro.props;
+const decimals = Astro.props.decimals ?? precision(...items.map((i) => i.value));
 const max = Astro.props.max ?? (Math.max(...items.map((i) => Math.abs(i.value)), 0) || 1);
 ---
 
