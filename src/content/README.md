@@ -88,7 +88,7 @@ VN-Index tăng 14,22 điểm (+0,80%) lên 1.789,31 điểm.
 
 ## 3. Báo cáo vĩ mô tuần — `src/content/bao-cao/2026-10-04.mdx`
 
-File `.mdx` dùng được các thành phần trình bày mà không cần dòng `import`. Xem bài mẫu đầy đủ tại `bao-cao/2026-09-27.mdx`.
+File `.mdx` dùng được các thành phần trình bày mà không cần dòng `import`. Danh sách đầy đủ các thành phần nằm trong `docs/CONTENT.md`.
 
 ```mdx
 ---

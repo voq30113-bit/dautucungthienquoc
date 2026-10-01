@@ -6,6 +6,7 @@ Tài liệu này dành cho việc tự tay viết một bài, không qua schedul
 
 | Loại bài | Thư mục | Định dạng | Đường dẫn trên web |
 |---|---|---|---|
+| Điểm tin buổi sáng | `src/content/diem-tin/` | `.md` | `/diem-tin/<tên-file>/` |
 | Nhận định trước phiên | `src/content/nhan-dinh/` | `.md` | `/nhan-dinh/<tên-file>/` |
 | Tổng kết phiên | `src/content/tong-ket/` | `.md` | `/tong-ket/<tên-file>/` |
 | Báo cáo vĩ mô tuần | `src/content/bao-cao/` | `.mdx` (hoặc `.md`) | `/bao-cao/<tên-file>/` |
@@ -78,7 +79,7 @@ Bài `.mdx` dùng được các thành phần sau mà **không cần dòng impor
 | `<EventCalendar items={[{ date, title, sub }]} />` | Lịch sự kiện |
 | `<SourceList items={[{ label, url }]} />` | Danh sách nguồn (thường không cần, trang tự lấy từ `sources`) |
 
-Xem cách dùng đầy đủ trong bài mẫu `src/content/bao-cao/2026-09-27.mdx`.
+Xem ví dụ đầy đủ trong [`src/content/README.md`](../src/content/README.md).
 
 ## 5. Xem trước trên máy
 
