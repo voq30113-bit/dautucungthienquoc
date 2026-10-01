@@ -1,0 +1,235 @@
+---
+title: "VN-Index: hai kịch bản sau cú gãy 24/09 và ba phiên kiểm định vùng hợp lưu"
+date: 2026-09-28T19:30:00+07:00
+sessionDate: 2026-09-28
+standfirst: "Cú gãy khỏi tam giác hội tụ ngày 24/09 diễn ra ở khối lượng đúng bằng trung bình, và ba phiên liên tiếp sau đó giá đều đóng cửa trên cụm hỗ trợ hợp lưu 1.773 – 1.777. Áp lực bán của khối ngoại đã giảm từ 916 tỷ xuống dưới 300 tỷ mỗi phiên. Kịch bản rũ bỏ mạnh lên, nhưng chưa có phiên nào mang chữ ký khối lượng của một cú rũ thật."
+eyebrow: "Phân tích chuyên sâu · VN-Index · Dữ liệu đến 28/09/2026"
+tags: ["VN-Index", "phân tích kỹ thuật", "kịch bản", "khối ngoại", "khối lượng"]
+revision: "28/09 — cập nhật sau hai phiên 25/09 và 28/09"
+featured: true
+market:
+  vnindex: 1780.68
+  change: -4.43
+  changePct: -0.25
+  volume: 674370816
+  valueBn: 12400
+  foreignNetBn: -292.79
+  advancers: 116
+  decliners: 273
+  unchanged: 67
+sources:
+  - label: "API Entrade (DNSE) — dữ liệu OHLCV khung ngày, 224 phiên đến 28/09/2026"
+  - label: "Vietstock — Nhịp đập Thị trường 28/09/2026"
+    url: "https://vietstock.vn"
+  - label: "Báo Nhân Dân — Chứng khoán ngày 28/9/2026"
+    url: "https://nhandan.vn"
+  - label: "DNSE Senses — Tổng kết phiên 24/09/2026"
+    url: "https://www.dnse.com.vn"
+  - label: "VnExpress — Chứng khoán ngày 24/9/2026"
+    url: "https://vnexpress.net"
+  - label: "Vietstock — Kịch bản nào cho dòng tiền sau nâng hạng?"
+    url: "https://vietstock.vn"
+---
+
+<Callout tag="Bài này là gì">
+  Bản phân tích gốc được viết chiều 24/09 ngay sau khi VN-Index gãy khỏi mô hình tam giác hội tụ. Bản này giữ nguyên toàn bộ khung lập luận và bổ sung kết quả kiểm chứng sau hai phiên 25/09 và 28/09 — trong đó có bảng đối chiếu từng điều kiện đã nêu ban đầu với những gì thực sự xảy ra. Mọi chỉ báo được tính lại độc lập từ chuỗi dữ liệu 224 phiên, không lấy từ đồ thị.
+</Callout>
+
+## Trạng thái thị trường
+
+<TickerStrip
+  caption="VN-Index · Chốt phiên 28/09/2026"
+  items={[
+    { key: 'VN-Index', value: 1780.68, decimals: 2, delta: '−4,43 điểm · −0,25%', dir: 'down' },
+    { key: 'Khối lượng HOSE', value: 674.4, decimals: 1, unit: 'triệu CP', delta: '108% TB20 phiên', dir: 'up' },
+    { key: 'Giá trị HOSE', value: 12400, unit: 'tỷ', delta: 'giảm mạnh so với 16.681 tỷ ngày 24/09', dir: 'down' },
+    { key: 'Khối ngoại', value: -292.79, decimals: 2, signed: true, unit: 'tỷ', delta: 'từ 916 tỷ ngày 24/09', dir: 'up' },
+    { key: 'Độ rộng HOSE', value: [116, 273], sep: ' / ', delta: '67 mã đứng giá', dir: 'down' },
+    { key: 'RSI (14)', value: 45.42, decimals: 2, delta: 'từ 43,73 ngày 24/09', dir: 'up' },
+  ]}
+/>
+
+## Tóm tắt
+
+<KeyPoints items={[
+  'Cụm hỗ trợ hợp lưu đã giữ ba phiên liên tiếp. MA50 ở 1.773,74, đỉnh mây Kumo 1.772,97 và EMA200 1.776,96 nằm trong biên độ 4 điểm. Giá thấp nhất của cả ba phiên 24/09, 25/09 và 28/09 đều xuyên xuống dưới, nhưng cả ba lần đều đóng cửa bật lại phía trên.',
+  'Áp lực bán ngoại giảm nhanh hơn dự kiến. Từ 1.063 tỷ (23/09) xuống 916 tỷ (24/09) rồi còn 292,79 tỷ trên HOSE phiên 28/09 — dưới ngưỡng 300 tỷ mà bản gốc đặt làm tín hiệu đảo chiều.',
+  'Nhưng chưa có phiên nào mang chữ ký của một cú rũ thật. Chữ ký đó là khối lượng từ 140% trung bình trở lên kèm nến râu dưới dài. Phiên 28/09 có hình dạng nến đúng — đóng cửa ở 70% trên của biên độ ngày — nhưng khối lượng chỉ 108%.',
+  'Dấu hiệu phân phối trong khối lượng vẫn nguyên. Mười phiên gần nhất: phiên giảm bình quân 679,3 triệu cổ phiếu so với phiên tăng 598,3 triệu, tỷ lệ 1,14. Chỉ số này chưa hề cải thiện.',
+  'Mốc 1.716 vẫn là ranh giới phân định. Chừng nào chưa thủng, cấu trúc đáy sau cao hơn đáy trước tính từ đáy 28/07 vẫn còn nguyên và kịch bản rũ bỏ vẫn sống.',
+]} />
+
+## Ba phiên kể từ cú gãy
+
+<DataTable
+  caption="Diễn biến ba phiên 24/09 – 28/09"
+  columns={[
+    { label: 'Phiên' },
+    { label: 'Đóng cửa', num: true },
+    { label: 'Thay đổi', num: true, signed: true },
+    { label: 'Thấp nhất', num: true },
+    { label: 'KL (triệu CP)', num: true },
+    { label: '% TB20', num: true },
+  ]}
+  rows={[
+    ['24/09 · Thứ Năm', 1775.09, -26.56, 1772.24, 638.3, 99],
+    ['25/09 · Thứ Sáu', 1785.11, 10.02, 1771.57, 621.6, 98],
+    ['28/09 · Thứ Hai', 1780.68, -4.43, 1763.62, 674.4, 108],
+  ]}
+  note="Khối lượng lấy từ API Entrade, là tổng khối lượng sàn HOSE đã gồm giao dịch thoả thuận. Trung bình 20 phiên hiện ở 619,5 triệu cổ phiếu."
+/>
+
+Điều đáng chú ý nằm ở cột thấp nhất. Ba phiên liên tiếp giá đều thò xuống dưới vùng 1.772 — nơi tập trung MA50, đỉnh mây Kumo và EMA200 — rồi đều được kéo trở lại trước khi đóng cửa. Phiên 28/09 đi sâu nhất, chạm 1.763,62, tức đã bước vào vùng mà bản gốc gọi là *rũ nông* (1.753 – 1.763), và vẫn đóng cửa ở 1.780,68.
+
+Ba lần chạm rồi bật ở cùng một vùng là hành vi của một vùng hỗ trợ đang được kiểm định nghiêm túc, không phải một vùng bị bỏ qua. Nhưng cũng cần nói ngược lại: mỗi lần chạm, đáy lại thấp hơn một chút — 1.772,24 rồi 1.771,57 rồi 1.763,62. Người bán vẫn đang lấn dần.
+
+<BarChart
+  caption="Khối lượng theo phiên so với trung bình 20 phiên (%)"
+  unit="%"
+  items={[
+    { label: '17/09 · tăng', value: 116 },
+    { label: '18/09 · giảm', value: 138, tone: 'warn' },
+    { label: '21/09 · giảm', value: 102 },
+    { label: '22/09 · tăng', value: 82, tone: 'neutral' },
+    { label: '23/09 · giảm', value: 102 },
+    { label: '24/09 · giảm', value: 99 },
+    { label: '25/09 · tăng', value: 98, tone: 'neutral' },
+    { label: '28/09 · giảm', value: 108 },
+  ]}
+  note="Hai cột tô nhạt là phiên tăng. Phiên khối lượng cao nhất trong nhóm — 18/09 với 138% — lại là một phiên giảm. Chưa có phiên nào chạm ngưỡng 140% cần thiết để xác nhận một cú rũ bỏ."
+/>
+
+## Đối chiếu với các điều kiện đã nêu ngày 24/09
+
+Đây là phần quan trọng nhất của bản cập nhật. Bản gốc nêu tám điều kiện xác nhận cho hai kịch bản. Bảng dưới đối chiếu từng điều kiện với thực tế ba phiên vừa qua.
+
+<DataTable
+  caption="Bảng đối chiếu điều kiện xác nhận"
+  columns={[
+    { label: 'Điều kiện đã nêu 24/09' },
+    { label: 'Thuộc kịch bản' },
+    { label: 'Trạng thái 28/09' },
+  ]}
+  rows={[
+    ['Đóng cửa dưới 1.770 kèm khối lượng ≥ 110% TB20', 'Kịch bản 1', 'Chưa — đóng cửa thấp nhất là 1.775,09'],
+    ['Mọi phiên hồi thất bại dưới 1.795 (Kijun)', 'Kịch bản 1', 'Đúng — đỉnh cao nhất ba phiên là 1.796,29, không giữ được'],
+    ['Khối ngoại duy trì bán ròng trên 800 tỷ mỗi phiên', 'Kịch bản 1', 'Sai — đã giảm còn 292,79 tỷ'],
+    ['Độ rộng xấu hơn 100 tăng / 200 giảm', 'Kịch bản 1', 'Đúng — phiên 28/09 là 116 / 273'],
+    ['Phiên giảm sâu chạm 1.716–1.760, KL ≥ 140%, đóng cửa nửa trên', 'Kịch bản 2', 'Một phần — hình dạng nến đúng, khối lượng chỉ 108%'],
+    ['RSI chạm 30–35 và tạo phân kỳ dương', 'Kịch bản 2', 'Chưa — RSI đang tăng ngược lên 45,42'],
+    ['Khối ngoại chuyển sang cân bằng hoặc mua ròng', 'Kịch bản 2', 'Đang tiến tới — đã xuống dưới ngưỡng 300 tỷ'],
+    ['Phiên bật lại vượt 1.795 với khối lượng nở', 'Kịch bản 2', 'Chưa'],
+  ]}
+  note="Không điều kiện phủ định nào của hai kịch bản được kích hoạt: giá chưa đóng cửa trên 1.795, cũng chưa đóng cửa tuần dưới 1.716."
+/>
+
+Đọc bảng này theo hàng ngang thì thấy một bức tranh chia đôi rõ ràng. Hai điều kiện của kịch bản giảm đã đúng, nhưng đều là điều kiện về *cấu trúc giá và tâm lý* — nhịp hồi yếu và độ rộng xấu. Điều kiện về *dòng tiền* thì sai ngược: khối ngoại không những không duy trì bán mạnh mà còn giảm gần ba phần tư cường độ.
+
+Ở chiều ngược lại, kịch bản rũ bỏ có một điều kiện gần chạm và một điều kiện đúng một nửa. Cái đúng một nửa ấy đáng chú ý: phiên 28/09 có đúng hình dạng nến của một cú rũ, chỉ thiếu khối lượng.
+
+<Callout tag="Điểm mấu chốt">
+  Một cú rũ bỏ thật cần hai thứ đi cùng nhau: giá đâm sâu rồi bật lại, **và** khối lượng đột biến chứng minh có người mua lớn đỡ hàng ở đó. Phiên 28/09 mới có vế đầu. Khối lượng 108% trung bình nghĩa là giá được kéo lên bởi việc bên bán ngừng tay, chứ chưa phải bởi bên mua nhập cuộc. Đó là khác biệt giữa "hết người bán" và "có người gom" — và nó quyết định nhịp tăng sau đó bền hay không.
+</Callout>
+
+## Hai chỉ báo đi ngược nhau
+
+<DataTable
+  caption="Chỉ báo kỹ thuật · so sánh 24/09 và 28/09"
+  columns={[
+    { label: 'Chỉ báo' },
+    { label: '24/09', num: true },
+    { label: '28/09', num: true },
+    { label: 'Hướng' },
+  ]}
+  rows={[
+    ['RSI (14)', 43.73, 45.42, 'Cải thiện'],
+    ['MACD', 4.32, 0.65, 'Xấu đi'],
+    ['MACD Histogram', -4.84, -5.74, 'Xấu đi'],
+    ['MA50', 1774.20, 1773.74, 'Gần như đứng yên'],
+    ['Đỉnh mây Kumo', 1772.97, 1772.97, 'Đứng yên'],
+    ['Đáy mây Kumo', 1753.37, 1743.13, 'Hạ xuống'],
+    ['Bollinger dưới', 1778.71, 1772.76, 'Hạ xuống'],
+    ['ATR (14)', 27.65, 26.18, 'Biến động giảm'],
+  ]}
+  note="Mọi chỉ báo được tính lại từ chuỗi 224 phiên khung ngày, không lấy từ đồ thị."
+/>
+
+RSI nhích lên trong khi MACD tiếp tục xấu đi không phải mâu thuẫn — đó là đặc trưng của giai đoạn giá đi ngang sau một cú giảm. RSI phản ứng nhanh với việc giá ngừng rơi; MACD phản ánh khoảng cách giữa hai đường trung bình, vốn cần nhiều thời gian hơn để đảo chiều. Đường MACD nay chỉ còn 0,65, tức sắp cắt xuống dưới 0 — nếu điều đó xảy ra, động lượng trung hạn chính thức chuyển sang âm, và đó là điểm cần theo dõi trong tuần này.
+
+Biến động giảm (ATR từ 27,65 xuống 26,18) cùng dải Bollinger co lại là dấu hiệu thị trường đang nén. Nén thường kết thúc bằng một cú bung mạnh về một phía — nên vùng giá hẹp hiện tại nhiều khả năng không kéo dài quá lâu.
+
+## Bản đồ các mốc giá
+
+<LevelLadder
+  caption="VN-Index · Các mốc quyết định tính đến 28/09/2026"
+  levels={[
+    { level: 1813, label: 'MA20 · Bollinger giữa', note: 'Mốc phục hồi thứ hai' },
+    { level: 1797, label: 'Kijun (26)', note: 'Mốc phục hồi thứ nhất — ba phiên hồi đều thất bại dưới đây' },
+    { level: 1781, label: 'Đóng cửa 28/09', here: true },
+    { level: 1777, label: 'EMA200', note: 'Cận trên cụm hợp lưu' },
+    { level: 1774, label: 'MA50', note: 'Đã giữ được ba phiên liên tiếp trên cơ sở đóng cửa' },
+    { level: 1773, label: 'Đỉnh mây Kumo', note: 'Cận dưới cụm hợp lưu' },
+    { level: 1764, label: 'Đáy phiên 28/09', note: 'Điểm sâu nhất của nhịp kiểm định' },
+    { level: 1743, label: 'Đáy mây Kumo', note: 'Mất mốc này là mất toàn bộ cấu trúc mây' },
+    { level: 1716, label: 'Đáy 17/08', note: 'Ranh giới phân định hai kịch bản' },
+    { level: 1651, label: 'Đáy 28/07', note: 'Ranh giới giữa rũ bỏ và gãy cấu trúc' },
+  ]}
+/>
+
+## Kịch bản cập nhật
+
+Bản gốc đưa ra hai kịch bản với xác suất 45% và 40%, phần còn lại là bật lên ngay. Sau ba phiên, em điều chỉnh như sau, và nói rõ lý do điều chỉnh.
+
+<ScenarioCards
+  scenarios={[
+    { name: 'Rũ bỏ rồi vào sóng tăng', probability: 50, range: '1.716 – 1.780', tone: 'pos', body: 'Tăng từ 45%. Lý do: khối ngoại đã giảm bán dưới ngưỡng 300 tỷ, cụm hợp lưu giữ ba phiên, và phiên 28/09 đã có hình dạng nến rũ. Cần thêm một phiên khối lượng từ 140% trung bình để xác nhận.' },
+    { name: 'Tích luỹ đi ngang kéo dài', probability: 30, range: '1.765 – 1.815', tone: 'neu', body: 'Kịch bản mới, không có trong bản gốc. Biến động co lại, dải Bollinger hẹp và thanh khoản giá trị giảm cho thấy thị trường có thể đi ngang chờ kết quả kinh doanh quý III thay vì chọn hướng ngay.' },
+    { name: 'Giảm tiếp, xu hướng trung hạn xác lập', probability: 20, range: '1.651 – 1.740', tone: 'neg', body: 'Giảm từ 40%. Lý do giảm không phải vì cấu trúc giá tốt lên — chuỗi đỉnh thấp dần và độ rộng xấu vẫn nguyên — mà vì điều kiện dòng tiền cốt lõi của kịch bản này đã bị thực tế phủ nhận.' },
+  ]}
+/>
+
+Điều làm em hạ xác suất kịch bản giảm không phải là giá đã hồi. Giá gần như không đi đâu cả: 1.775,09 lên 1.780,68 trong ba phiên là 0,3%. Điều thay đổi là **cường độ bán của khối ngoại**, vốn là một trong bốn trụ cột của lập luận giảm trong bản gốc. Khi một trụ cột bị dữ liệu phủ nhận, xác suất phải điều chỉnh — kể cả khi ba trụ cột còn lại vẫn đứng.
+
+Ngược lại, em không nâng kịch bản rũ bỏ lên cao hơn 50% vì điều kiện quan trọng nhất của nó — khối lượng xác nhận — vẫn chưa xuất hiện. Ba phiên giữ được hỗ trợ ở khối lượng trung bình là tin tốt vừa phải, không phải tín hiệu vào hàng.
+
+## Điều cần theo dõi tuần này
+
+<EventCalendar
+  caption="Tuần 28/09 – 02/10/2026 · Lịch dự kiến"
+  items={[
+    { date: '29/09', title: 'Số liệu kinh tế – xã hội quý III và 9 tháng', sub: 'Cục Thống kê · GDP, CPI, xuất nhập khẩu — nền tảng cho kỳ vọng lợi nhuận quý III' },
+    { date: '30/09', title: 'Kết thúc quý III', sub: 'Chốt số liệu tín dụng và thanh khoản hệ thống, thường kéo theo biến động cuối quý' },
+    { date: '01/10', title: 'Chỉ số PMI sản xuất tháng 9', sub: 'Việt Nam và các nền kinh tế lớn' },
+    { date: '02/10', title: 'Báo cáo việc làm tháng 9 của Mỹ', sub: 'Tác động tới kỳ vọng lãi suất Fed và chỉ số DXY' },
+  ]}
+/>
+
+Ba con số cần nhìn mỗi ngày, giữ nguyên từ bản gốc, kèm trạng thái hiện tại:
+
+<DataTable
+  caption="Bảng theo dõi hằng ngày"
+  columns={[
+    { label: 'Chỉ báo' },
+    { label: '24/09', num: true },
+    { label: '28/09', num: true },
+    { label: 'Ngưỡng đảo' },
+  ]}
+  rows={[
+    ['Tỷ lệ khối lượng phiên giảm / phiên tăng', '1,15', '1,14', 'dưới 1,00'],
+    ['Khối ngoại bán ròng HOSE (tỷ đồng)', '916', '292,79', 'dưới 300 — đã đạt'],
+    ['Số mã tăng trên HOSE', '81', '116', 'trên 150'],
+  ]}
+  note="Chỉ tiêu khối ngoại đã chạm ngưỡng đảo. Hai chỉ tiêu còn lại cải thiện nhưng chưa đạt."
+/>
+
+## Rủi ro của chính phân tích này
+
+<RiskList
+  items={[
+    { name: 'Xác suất là đánh giá chủ quan', severity: 'hi', text: 'Các con số 50 / 30 / 20 là kết quả cân nhắc trọng số bằng chứng, không phải đầu ra của mô hình thống kê. Người đọc có trọng số khác sẽ ra con số khác.' },
+    { name: 'Ba phiên là mẫu quá nhỏ', severity: 'hi', text: 'Việc hạ xác suất kịch bản giảm dựa trên một phiên khối ngoại bán ít. Một phiên bán ròng trên 800 tỷ trong tuần này sẽ lập tức đảo ngược điều chỉnh đó.' },
+    { name: 'Số liệu khối ngoại lệch giữa các nguồn', severity: 'md', text: 'Phiên 28/09: bán ròng HOSE 292,79 tỷ theo Vietstock, bán ròng cả ba sàn 220 tỷ theo Nhân Dân, và một bản tin khác ghi 251 tỷ. Khác biệt đến từ phạm vi sàn và cách tính khớp lệnh so với thoả thuận.' },
+    { name: 'Hai chuỗi khối lượng song song', severity: 'md', text: 'Khối lượng Entrade đã gồm thoả thuận (674,4 triệu) khác với con số khớp lệnh trên báo (547 triệu). Không nên trộn hai con số tuyệt đối từ hai nguồn.' },
+    { name: 'Phân tích kỹ thuật mô tả xác suất, không mô tả nhân quả', severity: 'lo', text: 'Một tin vĩ mô hoặc chính sách bất ngờ có thể vô hiệu hoá toàn bộ cấu trúc nêu trên trong một phiên.' },
+  ]}
+/>
